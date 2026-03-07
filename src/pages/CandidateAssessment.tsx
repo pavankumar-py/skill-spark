@@ -211,7 +211,7 @@ const CandidateAssessment = () => {
                 </div>
                 <h3 className="text-lg font-medium mb-6">{q.question_text}</h3>
                 <RadioGroup value={answers[q.id] || ""} onValueChange={(v) => setAnswers({ ...answers, [q.id]: v })}>
-                  {(q.options as string[] || []).map((opt: string, i: number) => (
+                  {(Array.isArray(q.options) ? q.options : []).map((opt: string, i: number) => (
                     <div key={i} className="flex items-center space-x-3 p-3 rounded-lg border hover:bg-secondary/50 transition-colors cursor-pointer">
                       <RadioGroupItem value={String(i)} id={`opt-${i}`} />
                       <label htmlFor={`opt-${i}`} className="text-sm cursor-pointer flex-1">{opt}</label>
