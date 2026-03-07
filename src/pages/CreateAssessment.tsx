@@ -44,52 +44,81 @@ const CreateAssessment = () => {
   const handleCreate = async () => {
     if (!companyId) { toast.error("Company not found"); return; }
     setSaving(true);
-    const { data, error } = await supabase.from("assessments").insert({
-      company_id: companyId,
-      title: form.title,
-      role: form.role,
-      tech_stack: form.techStack,
-      experience_level: form.experience,
-      aptitude_count: Number(form.aptitudeCount),
-      coding_count: Number(form.codingCount),
-      aptitude_difficulty: form.aptitudeDifficulty,
-      coding_difficulty: form.codingDifficulty,
-      coding_topics: form.codingTopics,
-      duration_minutes: Number(form.duration),
-      anti_cheat: form.antiCheat,
-      allow_execution: form.allowExecution,
-    }).select("id").single();
-    setSaving(false);
+    toast.info("Generating AI-powered questions... This may take a moment.");
 
-    if (error) { toast.error(error.message); return; }
+    try {
+      // Step 1: Generate questions via AI
+      const { data: aiData, error: aiError } = await supabase.functions.invoke("generate-questions", {
+        body: {
+          role: form.role,
+          techStack: form.techStack,
+          experience: form.experience,
+          aptitudeCount: Number(form.aptitudeCount),
+          aptitudeDifficulty: form.aptitudeDifficulty,
+          codingCount: Number(form.codingCount),
+          codingDifficulty: form.codingDifficulty,
+          codingTopics: form.codingTopics,
+        },
+      });
 
-    // Generate sample questions
-    const aptitudeQs = Array.from({ length: Number(form.aptitudeCount) }, (_, i) => ({
-      assessment_id: data.id,
-      type: "aptitude" as const,
-      question_text: `Sample aptitude question ${i + 1} for ${form.role} role`,
-      options: JSON.stringify(["Option A", "Option B", "Option C", "Option D"]),
-      correct_answer: Math.floor(Math.random() * 4),
-      sort_order: i,
-    }));
-    const codingQs = Array.from({ length: Number(form.codingCount) }, (_, i) => ({
-      assessment_id: data.id,
-      type: "coding" as const,
-      question_text: `Coding question ${i + 1}`,
-      coding_title: `Coding Challenge ${i + 1}`,
-      coding_description: `Write a solution for this ${form.codingDifficulty || "medium"} level problem related to ${form.codingTopics[0] || "algorithms"}.`,
-      coding_difficulty: form.codingDifficulty,
-      coding_topic: form.codingTopics[i % form.codingTopics.length] || "Algorithms",
-      test_cases: JSON.stringify([{ input: "sample input", expectedOutput: "sample output" }]),
-      starter_code: JSON.stringify({ python: "def solution():\n    # Your code here\n    pass", javascript: "function solution() {\n    // Your code here\n}" }),
-      sort_order: i,
-    }));
+      if (aiError || aiData?.error) {
+        toast.error(aiData?.error || aiError?.message || "Failed to generate questions");
+        setSaving(false);
+        return;
+      }
 
-    await supabase.from("questions").insert([...aptitudeQs, ...codingQs]);
+      // Step 2: Create the assessment
+      const { data, error } = await supabase.from("assessments").insert({
+        company_id: companyId,
+        title: form.title,
+        role: form.role,
+        tech_stack: form.techStack,
+        experience_level: form.experience,
+        aptitude_count: Number(form.aptitudeCount),
+        coding_count: Number(form.codingCount),
+        aptitude_difficulty: form.aptitudeDifficulty,
+        coding_difficulty: form.codingDifficulty,
+        coding_topics: form.codingTopics,
+        duration_minutes: Number(form.duration),
+        anti_cheat: form.antiCheat,
+        allow_execution: form.allowExecution,
+      }).select("id").single();
 
-    setCreatedId(data.id);
-    setCreated(true);
-    toast.success("Assessment created successfully!");
+      if (error) { toast.error(error.message); setSaving(false); return; }
+
+      // Step 3: Insert AI-generated questions
+      const aptitudeQs = (aiData.aptitude || []).map((q: any, i: number) => ({
+        assessment_id: data.id,
+        type: "aptitude" as const,
+        question_text: q.question_text,
+        options: JSON.stringify(q.options),
+        correct_answer: q.correct_answer,
+        sort_order: i,
+      }));
+
+      const codingQs = (aiData.coding || []).map((q: any, i: number) => ({
+        assessment_id: data.id,
+        type: "coding" as const,
+        question_text: q.coding_title,
+        coding_title: q.coding_title,
+        coding_description: q.coding_description,
+        coding_difficulty: q.coding_difficulty,
+        coding_topic: q.coding_topic,
+        test_cases: JSON.stringify(q.test_cases),
+        starter_code: JSON.stringify({ python: q.starter_code_python, javascript: q.starter_code_javascript }),
+        sort_order: i,
+      }));
+
+      await supabase.from("questions").insert([...aptitudeQs, ...codingQs]);
+
+      setCreatedId(data.id);
+      setCreated(true);
+      toast.success("Assessment created with AI-generated questions!");
+    } catch (e: any) {
+      toast.error(e.message || "Something went wrong");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const assessmentLink = `${window.location.origin}/take/${createdId}`;
