@@ -124,11 +124,10 @@ const EvaluateCandidates = () => {
                 <tr className="border-b bg-secondary/50">
                   <th className="p-3 w-10"><Checkbox checked={selected.length === filtered.length && filtered.length > 0} onCheckedChange={toggleAll} /></th>
                   <th className="text-left p-3 font-medium text-muted-foreground">Name</th>
-                  <th className="text-left p-3 font-medium text-muted-foreground">Email</th>
                   <th className="text-left p-3 font-medium text-muted-foreground">Assessment</th>
-                  <th className="text-center p-3 font-medium text-muted-foreground">Aptitude</th>
-                  <th className="text-center p-3 font-medium text-muted-foreground">Coding</th>
-                  <th className="text-center p-3 font-medium text-muted-foreground">Total</th>
+                  <th className="text-center p-3 font-medium text-muted-foreground">Aptitude (marks)</th>
+                  <th className="text-center p-3 font-medium text-muted-foreground">Coding (marks)</th>
+                  <th className="text-center p-3 font-medium text-muted-foreground">Total %</th>
                   <th className="text-left p-3 font-medium text-muted-foreground">AI Summary</th>
                 </tr>
               </thead>
@@ -136,12 +135,14 @@ const EvaluateCandidates = () => {
                 {filtered.map((c, i) => (
                   <motion.tr key={c.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.03 }} className="border-b last:border-0 hover:bg-secondary/30 transition-colors">
                     <td className="p-3"><Checkbox checked={selected.includes(c.id)} onCheckedChange={() => toggleSelect(c.id)} /></td>
-                    <td className="p-3 font-medium cursor-pointer hover:text-primary transition-colors" onClick={() => navigate(`/app/evaluate/${c.id}`)}>{c.name}</td>
-                    <td className="p-3 text-muted-foreground">{c.email}</td>
+                    <td className="p-3">
+                      <span className="font-medium cursor-pointer hover:text-primary transition-colors" onClick={() => navigate(`/app/evaluate/${c.id}`)}>{c.name}</span>
+                      <span className="block text-xs text-muted-foreground">{c.email}</span>
+                    </td>
                     <td className="p-3 text-muted-foreground text-xs">{c.assessmentName}</td>
-                    <td className="p-3 text-center">{c.aptitudeScore}</td>
-                    <td className="p-3 text-center">{c.codingScore}</td>
-                    <td className="p-3 text-center"><Badge variant={c.totalScore >= 80 ? "default" : c.totalScore >= 60 ? "secondary" : "destructive"}>{c.totalScore}</Badge></td>
+                    <td className="p-3 text-center font-medium">{c.aptitudeScore}</td>
+                    <td className="p-3 text-center font-medium">{c.codingScore}</td>
+                    <td className="p-3 text-center"><Badge variant={c.totalScore >= 80 ? "default" : c.totalScore >= 50 ? "secondary" : "destructive"}>{c.totalScore}%</Badge></td>
                     <td className="p-3 text-xs text-muted-foreground max-w-[200px] truncate">{c.aiSummary || "—"}</td>
                   </motion.tr>
                 ))}
