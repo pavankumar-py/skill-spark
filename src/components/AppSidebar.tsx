@@ -40,7 +40,7 @@ export function AppSidebar() {
           <div className="h-7 w-7 rounded-lg bg-primary flex items-center justify-center shrink-0">
             <Zap className="h-3.5 w-3.5 text-primary-foreground" />
           </div>
-          {!collapsed && <span className="font-semibold text-sm">AssessKit</span>}
+          {!collapsed && <span className="font-semibold text-sm">{!collapsed && <span className="font-semibold text-sm">Verifyr</span>}</span>}
         </div>
 
         <SidebarGroup>

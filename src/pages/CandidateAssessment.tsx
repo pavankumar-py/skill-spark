@@ -297,7 +297,7 @@ const CandidateAssessment = () => {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-sm">
           <div className="flex items-center gap-2 mb-8 justify-center">
             <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center"><Zap className="h-4 w-4 text-primary-foreground" /></div>
-            <span className="text-xl font-semibold">AssessKit</span>
+            <span className="text-xl font-semibold">Verifyr</span>
           </div>
           <div className="glass-card p-6">
             <h2 className="text-lg font-semibold mb-1">{assessment.title}</h2>
@@ -324,7 +324,7 @@ const CandidateAssessment = () => {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-lg">
           <div className="flex items-center gap-2 mb-8 justify-center">
             <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center"><Zap className="h-4 w-4 text-primary-foreground" /></div>
-            <span className="text-xl font-semibold">AssessKit</span>
+            <span className="text-xl font-semibold">Verifyr</span>
           </div>
           <div className="glass-card p-6 space-y-6">
             <div className="text-center">
@@ -408,7 +408,7 @@ const CandidateAssessment = () => {
     <div className="h-screen bg-background flex flex-col">
       <header className="h-12 border-b flex items-center justify-between px-4 bg-card shrink-0">
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5"><div className="h-6 w-6 rounded bg-primary flex items-center justify-center"><Zap className="h-3 w-3 text-primary-foreground" /></div><span className="text-sm font-medium">AssessKit</span></div>
+          <div className="flex items-center gap-1.5"><div className="h-6 w-6 rounded bg-primary flex items-center justify-center"><Zap className="h-3 w-3 text-primary-foreground" /></div><span className="text-sm font-medium">Verifyr</span></div>
           <Badge variant="secondary" className="text-xs">{phase === "aptitude" ? "Aptitude" : "Coding"}</Badge>
         </div>
         <div className="flex items-center gap-3">
