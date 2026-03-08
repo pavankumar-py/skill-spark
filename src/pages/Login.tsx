@@ -59,7 +59,7 @@ const Login = () => {
           transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
         />
 
-        <div className="relative z-10 flex flex-col justify-between p-12 w-full">
+        <div className="relative z-10 flex flex-col justify-center items-center p-12 w-full h-full">
           {/* Logo */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -74,7 +74,7 @@ const Login = () => {
           </motion.div>
 
           {/* Main content */}
-          <div className="max-w-md">
+          <div className="max-w-md text-center">
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -94,7 +94,7 @@ const Login = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="space-y-3 mb-10"
+              className="space-y-3 mb-10 inline-flex flex-col items-start"
             >
               {features.map((f, i) => (
                 <motion.div
@@ -113,25 +113,6 @@ const Login = () => {
             </motion.div>
 
           </div>
-
-          {/* Bottom testimonial */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.7 }}
-            className="bg-white/10 backdrop-blur-sm rounded-xl p-5 border border-white/10 max-w-md"
-          >
-            <p className="text-sm text-white/80 leading-relaxed italic">
-              "AssessKit cut our screening time by 70%. The AI-generated questions are spot-on and the anti-cheat features give us confidence in every assessment."
-            </p>
-            <div className="flex items-center gap-3 mt-3">
-              <div className="h-8 w-8 rounded-full bg-white/20 flex items-center justify-center text-xs font-bold text-white">SK</div>
-              <div>
-                <p className="text-xs font-semibold text-white">Sarah Kim</p>
-                <p className="text-xs text-white/50">VP Engineering, TechCorp</p>
-              </div>
-            </div>
-          </motion.div>
         </div>
       </div>
 
