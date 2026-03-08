@@ -97,7 +97,7 @@ const CandidateAssessment = () => {
   const submitAssessment = async () => {
     if (!candidateId) return;
 
-    toast.info("Submitting and evaluating your assessment...");
+    setPhase("evaluating");
 
     // Save aptitude responses
     const aptitudeResponses = aptitudeQuestions.map((q) => ({
