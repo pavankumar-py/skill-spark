@@ -97,6 +97,8 @@ const CandidateAssessment = () => {
   const submitAssessment = async () => {
     if (!candidateId) return;
 
+    toast.info("Submitting and evaluating your assessment...");
+
     // Save aptitude responses
     const aptitudeResponses = aptitudeQuestions.map((q) => ({
       candidate_id: candidateId,
@@ -118,26 +120,81 @@ const CandidateAssessment = () => {
     });
     if (codingResponses.length) await supabase.from("candidate_responses").insert(codingResponses);
 
-    // Calculate scores
-    const correctAptitude = aptitudeResponses.filter((r) => r.is_correct).length;
-    const aptitudeScore = aptitudeQuestions.length > 0 ? Math.round((correctAptitude / aptitudeQuestions.length) * 100) : 0;
-    const codingScore = codingQuestions.length > 0 ? 70 : 0; // Placeholder
-    const totalScore = aptitudeQuestions.length > 0 && codingQuestions.length > 0
-      ? Math.round((aptitudeScore + codingScore) / 2)
-      : aptitudeScore || codingScore;
+    // Build data for AI evaluation
+    const aptitudeData = {
+      questions: aptitudeQuestions.map((q) => {
+        let opts = q.options;
+        if (typeof opts === "string") { try { opts = JSON.parse(opts); } catch { opts = []; } }
+        const options = Array.isArray(opts) ? opts as string[] : [];
+        return {
+          text: q.question_text,
+          options,
+          correctAnswer: q.correct_answer ?? 0,
+          candidateAnswer: answers[q.id] !== undefined ? Number(answers[q.id]) : null,
+        };
+      }),
+    };
+
+    const codingData = {
+      questions: codingQuestions.map((q) => {
+        let tc = q.test_cases;
+        if (typeof tc === "string") { try { tc = JSON.parse(tc); } catch { tc = []; } }
+        const testCases = Array.isArray(tc) ? tc as { input: string; expectedOutput: string }[] : [];
+        const key = Object.keys(code).find((k) => k.startsWith(q.id));
+        return {
+          title: q.coding_title || "Untitled",
+          description: q.coding_description || "",
+          testCases,
+          candidateCode: key ? code[key] : null,
+          language,
+        };
+      }),
+    };
+
+    const assessmentInfo = {
+      role: assessment?.role || "",
+      techStack: assessment?.tech_stack || [],
+      experienceLevel: assessment?.experience_level || "mid-level",
+    };
+
+    // Call AI evaluation
+    let evaluation = null;
+    try {
+      const { data, error } = await supabase.functions.invoke("evaluate-candidate", {
+        body: { candidateId, aptitudeData, codingData, assessmentInfo },
+      });
+      if (error) throw error;
+      evaluation = data?.evaluation;
+    } catch (e) {
+      console.error("AI evaluation failed, using fallback scoring:", e);
+    }
+
+    // Fallback scoring if AI fails
+    if (!evaluation) {
+      const correctAptitude = aptitudeResponses.filter((r) => r.is_correct).length;
+      const aptitudeScore = aptitudeQuestions.length > 0 ? Math.round((correctAptitude / aptitudeQuestions.length) * 100) : 0;
+      const codingScore = 0;
+      const totalScore = aptitudeQuestions.length > 0 ? aptitudeScore : codingScore;
+      evaluation = {
+        aptitude_score: aptitudeScore,
+        coding_score: codingScore,
+        total_score: totalScore,
+        ai_summary: `Aptitude: ${aptitudeScore}% (${aptitudeResponses.filter((r) => r.is_correct).length}/${aptitudeQuestions.length} correct). Coding evaluation unavailable.`,
+      };
+    }
 
     await supabase.from("candidate_scores").insert({
       candidate_id: candidateId,
-      aptitude_score: aptitudeScore,
-      coding_score: codingScore,
-      total_score: totalScore,
-      ai_summary: `Candidate scored ${aptitudeScore}% on aptitude and ${codingScore}% on coding.`,
+      aptitude_score: evaluation.aptitude_score,
+      coding_score: evaluation.coding_score,
+      total_score: evaluation.total_score,
+      ai_summary: evaluation.ai_summary,
     });
 
     await supabase.from("candidates").update({ status: "completed", completed_at: new Date().toISOString() }).eq("id", candidateId);
 
     setPhase("submitted");
-    toast.success("Assessment submitted!");
+    toast.success("Assessment submitted and evaluated!");
   };
 
   const runCode = () => {
