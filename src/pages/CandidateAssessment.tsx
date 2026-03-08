@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, ArrowLeft, Clock, AlertTriangle, Play, Zap, Send, Brain, Calculator, Code } from "lucide-react";
+import { ArrowRight, ArrowLeft, Clock, AlertTriangle, Play, Zap, Send, Brain } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import Editor from "@monaco-editor/react";
