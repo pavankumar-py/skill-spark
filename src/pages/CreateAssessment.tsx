@@ -13,7 +13,9 @@ import { useAuth } from "@/contexts/AuthContext";
 
 const steps = ["Details", "Aptitude", "Coding", "Configuration", "Review"];
 const techOptions = ["Python", "JavaScript", "React", "Node.js", "TypeScript", "SQL", "Java", "Go", "Rust", "C++"];
-const topicOptions = ["DSA", "Arrays", "Strings", "OOPs", "Recursion", "Algorithms"];
+const codingTopicOptions = ["DSA", "Arrays", "Strings", "OOPs", "Recursion", "Algorithms"];
+const numericalTopicOptions = ["Percentages", "Ratios", "Number Series", "Profit & Loss", "Time & Work", "Probability", "Averages", "Simple Interest", "Compound Interest", "Speed & Distance"];
+const technicalMcqTopicOptions = ["Networking", "Cloud Computing", "Databases", "Operating Systems", "Data Structures", "Algorithms", "System Design", "Security", "APIs", "DevOps"];
 
 const CreateAssessment = () => {
   const { companyId } = useAuth();
@@ -26,8 +28,11 @@ const CreateAssessment = () => {
     role: "",
     techStack: [] as string[],
     experience: "",
-    aptitudeCount: "10",
+    technicalCount: "5",
+    numericalCount: "5",
     aptitudeDifficulty: "",
+    numericalTopics: [] as string[],
+    technicalMcqTopics: [] as string[],
     codingCount: "2",
     codingDifficulty: "",
     codingTopics: [] as string[],
@@ -53,8 +58,11 @@ const CreateAssessment = () => {
           role: form.role,
           techStack: form.techStack,
           experience: form.experience,
-          aptitudeCount: Number(form.aptitudeCount),
+          technicalCount: Number(form.technicalCount),
+          numericalCount: Number(form.numericalCount),
           aptitudeDifficulty: form.aptitudeDifficulty,
+          numericalTopics: form.numericalTopics,
+          technicalMcqTopics: form.technicalMcqTopics,
           codingCount: Number(form.codingCount),
           codingDifficulty: form.codingDifficulty,
           codingTopics: form.codingTopics,
@@ -74,7 +82,7 @@ const CreateAssessment = () => {
         role: form.role,
         tech_stack: form.techStack,
         experience_level: form.experience,
-        aptitude_count: Number(form.aptitudeCount),
+        aptitude_count: Number(form.technicalCount) + Number(form.numericalCount),
         coding_count: Number(form.codingCount),
         aptitude_difficulty: form.aptitudeDifficulty,
         coding_difficulty: form.codingDifficulty,
@@ -177,11 +185,55 @@ const CreateAssessment = () => {
             </div>
           )}
           {step === 1 && (
-            <div className="space-y-4">
+            <div className="space-y-5">
               <h3 className="font-medium">Aptitude Questions</h3>
-              <div className="space-y-2"><Label>Number of Questions</Label><Select value={form.aptitudeCount} onValueChange={(v) => setForm({ ...form, aptitudeCount: v })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{["5", "10", "15", "20"].map((n) => <SelectItem key={n} value={n}>{n} questions</SelectItem>)}</SelectContent></Select></div>
-              <div className="space-y-2"><Label>Difficulty Level</Label><Select value={form.aptitudeDifficulty} onValueChange={(v) => setForm({ ...form, aptitudeDifficulty: v })}><SelectTrigger><SelectValue placeholder="Select difficulty" /></SelectTrigger><SelectContent>{["Easy", "Medium", "Hard"].map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent></Select></div>
-              <p className="text-xs text-muted-foreground">Questions will be AI-generated based on the selected role and tech stack.</p>
+              
+              <div className="space-y-3 p-4 rounded-lg border">
+                <h4 className="text-sm font-medium">Technical MCQs</h4>
+                <div className="space-y-2">
+                  <Label>Number of Questions</Label>
+                  <Select value={form.technicalCount} onValueChange={(v) => setForm({ ...form, technicalCount: v })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>{["0", "2", "3", "5", "7", "10"].map((n) => <SelectItem key={n} value={n}>{n} questions</SelectItem>)}</SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Topics</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {technicalMcqTopicOptions.map((t) => (
+                      <Badge key={t} variant={form.technicalMcqTopics.includes(t) ? "default" : "outline"} className="cursor-pointer" onClick={() => setForm({ ...form, technicalMcqTopics: toggleArrayItem(form.technicalMcqTopics, t) })}>{t}</Badge>
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground">Topics will also be inferred from your selected tech stack.</p>
+                </div>
+              </div>
+
+              <div className="space-y-3 p-4 rounded-lg border">
+                <h4 className="text-sm font-medium">Numerical Ability</h4>
+                <div className="space-y-2">
+                  <Label>Number of Questions</Label>
+                  <Select value={form.numericalCount} onValueChange={(v) => setForm({ ...form, numericalCount: v })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>{["0", "2", "3", "5", "7", "10"].map((n) => <SelectItem key={n} value={n}>{n} questions</SelectItem>)}</SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Topics</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {numericalTopicOptions.map((t) => (
+                      <Badge key={t} variant={form.numericalTopics.includes(t) ? "default" : "outline"} className="cursor-pointer" onClick={() => setForm({ ...form, numericalTopics: toggleArrayItem(form.numericalTopics, t) })}>{t}</Badge>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Difficulty Level</Label>
+                <Select value={form.aptitudeDifficulty} onValueChange={(v) => setForm({ ...form, aptitudeDifficulty: v })}>
+                  <SelectTrigger><SelectValue placeholder="Select difficulty" /></SelectTrigger>
+                  <SelectContent>{["Easy", "Medium", "Hard"].map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
             </div>
           )}
           {step === 2 && (
@@ -189,7 +241,7 @@ const CreateAssessment = () => {
               <h3 className="font-medium">Coding Questions</h3>
               <div className="space-y-2"><Label>Number of Questions</Label><Select value={form.codingCount} onValueChange={(v) => setForm({ ...form, codingCount: v })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{["1", "2", "3", "4", "5"].map((n) => <SelectItem key={n} value={n}>{n} questions</SelectItem>)}</SelectContent></Select></div>
               <div className="space-y-2"><Label>Difficulty Level</Label><Select value={form.codingDifficulty} onValueChange={(v) => setForm({ ...form, codingDifficulty: v })}><SelectTrigger><SelectValue placeholder="Select difficulty" /></SelectTrigger><SelectContent>{["Easy", "Medium", "Hard"].map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent></Select></div>
-              <div className="space-y-2"><Label>Topics</Label><div className="flex flex-wrap gap-2">{topicOptions.map((t) => <Badge key={t} variant={form.codingTopics.includes(t) ? "default" : "outline"} className="cursor-pointer" onClick={() => setForm({ ...form, codingTopics: toggleArrayItem(form.codingTopics, t) })}>{t}</Badge>)}</div></div>
+              <div className="space-y-2"><Label>Topics</Label><div className="flex flex-wrap gap-2">{codingTopicOptions.map((t) => <Badge key={t} variant={form.codingTopics.includes(t) ? "default" : "outline"} className="cursor-pointer" onClick={() => setForm({ ...form, codingTopics: toggleArrayItem(form.codingTopics, t) })}>{t}</Badge>)}</div></div>
               <p className="text-xs text-muted-foreground">Supported languages: Python, JavaScript</p>
             </div>
           )}
@@ -209,8 +261,8 @@ const CreateAssessment = () => {
                 <div className="space-y-1"><p className="text-muted-foreground text-xs">Role</p><p className="font-medium">{form.role || "—"}</p></div>
                 <div className="space-y-1"><p className="text-muted-foreground text-xs">Experience</p><p className="font-medium">{form.experience || "—"}</p></div>
                 <div className="space-y-1"><p className="text-muted-foreground text-xs">Duration</p><p className="font-medium">{form.duration} min</p></div>
-                <div className="space-y-1"><p className="text-muted-foreground text-xs">Aptitude Questions</p><p className="font-medium">{form.aptitudeCount} ({form.aptitudeDifficulty || "—"})</p></div>
-                <div className="space-y-1"><p className="text-muted-foreground text-xs">Coding Questions</p><p className="font-medium">{form.codingCount} ({form.codingDifficulty || "—"})</p></div>
+                <div className="space-y-1"><p className="text-muted-foreground text-xs">Technical MCQs</p><p className="font-medium">{form.technicalCount} questions</p></div>
+                <div className="space-y-1"><p className="text-muted-foreground text-xs">Numerical Ability</p><p className="font-medium">{form.numericalCount} questions</p></div>
                 <div className="space-y-1 col-span-2"><p className="text-muted-foreground text-xs">Tech Stack</p><div className="flex flex-wrap gap-1">{form.techStack.length ? form.techStack.map((t) => <Badge key={t} variant="secondary" className="text-xs">{t}</Badge>) : <span className="text-muted-foreground">—</span>}</div></div>
                 <div className="space-y-1"><p className="text-muted-foreground text-xs">Anti-Cheat</p><p className="font-medium">{form.antiCheat ? "Enabled" : "Disabled"}</p></div>
                 <div className="space-y-1"><p className="text-muted-foreground text-xs">Code Execution</p><p className="font-medium">{form.allowExecution ? "Allowed" : "Disabled"}</p></div>
