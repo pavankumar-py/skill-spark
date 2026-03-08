@@ -13,7 +13,9 @@ import { useAuth } from "@/contexts/AuthContext";
 
 const steps = ["Details", "Aptitude", "Coding", "Configuration", "Review"];
 const techOptions = ["Python", "JavaScript", "React", "Node.js", "TypeScript", "SQL", "Java", "Go", "Rust", "C++"];
-const topicOptions = ["DSA", "Arrays", "Strings", "OOPs", "Recursion", "Algorithms"];
+const codingTopicOptions = ["DSA", "Arrays", "Strings", "OOPs", "Recursion", "Algorithms"];
+const numericalTopicOptions = ["Percentages", "Ratios", "Number Series", "Profit & Loss", "Time & Work", "Probability", "Averages", "Simple Interest", "Compound Interest", "Speed & Distance"];
+const technicalMcqTopicOptions = ["Networking", "Cloud Computing", "Databases", "Operating Systems", "Data Structures", "Algorithms", "System Design", "Security", "APIs", "DevOps"];
 
 const CreateAssessment = () => {
   const { companyId } = useAuth();
