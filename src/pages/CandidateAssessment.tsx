@@ -324,7 +324,7 @@ const CandidateAssessment = () => {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-lg">
           <div className="flex items-center gap-2 mb-8 justify-center">
             <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center"><Zap className="h-4 w-4 text-primary-foreground" /></div>
-            <span className="text-xl font-semibold">AssessKit</span>
+            <span className="text-xl font-semibold">Verifyr</span>
           </div>
           <div className="glass-card p-6 space-y-6">
             <div className="text-center">
