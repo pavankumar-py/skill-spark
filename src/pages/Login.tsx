@@ -122,7 +122,7 @@ const Login = () => {
         >
           {/* Mobile logo */}
           <div className="lg:hidden mb-10">
-            <span className="text-3xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">Verifyr</span>
+            <span className="text-3xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent" style={{ textShadow: '0 0 20px hsl(var(--primary) / 0.5), 0 0 40px hsl(var(--primary) / 0.3)' }}>Verifyr</span>
           </div>
 
           <h2 className="text-2xl font-bold tracking-tight mb-1">Welcome back</h2>
