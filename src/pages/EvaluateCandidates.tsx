@@ -42,6 +42,7 @@ const EvaluateCandidates = () => {
   const [filterPercent, setFilterPercent] = useState<string>("all");
   const [minScore, setMinScore] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [showComingSoon, setShowComingSoon] = useState(false);
   const [messageType, setMessageType] = useState<MessageType>("qualified");
   const [customMessage, setCustomMessage] = useState("");
 
@@ -90,7 +91,7 @@ const EvaluateCandidates = () => {
   const toggleAll = () => setSelected(selected.length === filtered.length ? [] : filtered.map((c) => c.id));
 
   const handleSend = () => { toast.success(`Messages sent to ${selected.length} candidate(s)!`); setShowModal(false); setSelected([]); };
-  const openSmartSend = () => { setCustomMessage(messageTemplates[messageType]); setShowModal(true); };
+  const openSmartSend = () => { setShowComingSoon(true); };
 
   if (loading) return <div className="p-6 text-muted-foreground">Loading...</div>;
 
@@ -170,6 +171,18 @@ const EvaluateCandidates = () => {
           <DialogFooter>
             <Button variant="outline" onClick={() => setShowModal(false)}>Cancel</Button>
             <Button onClick={handleSend}><Send className="h-4 w-4 mr-1" /> Send Messages</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={showComingSoon} onOpenChange={setShowComingSoon}>
+        <DialogContent className="max-w-sm text-center">
+          <DialogHeader>
+            <DialogTitle>Coming Soon</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground py-2">This feature will be available in the future. You'll be notified when it releases.</p>
+          <DialogFooter className="justify-center">
+            <Button onClick={() => setShowComingSoon(false)}>Got it</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
