@@ -33,6 +33,7 @@ const CandidateAssessment = () => {
   const [output, setOutput] = useState("");
   const [tabSwitches, setTabSwitches] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [acknowledged, setAcknowledged] = useState(false);
 
   // Load assessment
   useEffect(() => {
