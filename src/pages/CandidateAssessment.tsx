@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, ArrowLeft, Clock, AlertTriangle, Play, Zap, Send, Brain } from "lucide-react";
+import { ArrowRight, ArrowLeft, Clock, AlertTriangle, Play, Zap, Send, Brain, Calculator, Code } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import Editor from "@monaco-editor/react";
@@ -15,6 +15,21 @@ import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Phase = "register" | "aptitude" | "coding" | "evaluating" | "submitted";
+
+const NUMERICAL_KEYWORDS = [
+  "percentage", "percent", "ratio", "proportion", "profit", "loss", "interest",
+  "time and work", "speed", "distance", "average", "probability", "permutation",
+  "combination", "series", "sequence", "number series", "arithmetic", "geometric",
+  "factorial", "lcm", "hcf", "gcd", "divisible", "remainder", "modulo",
+  "train", "pipe", "cistern", "age", "mixture", "alligation", "boat", "stream",
+  "compound interest", "simple interest", "discount", "marked price",
+  "how many", "find the value", "what is the sum", "calculate",
+];
+
+function isNumericalQuestion(text: string): boolean {
+  const lower = text.toLowerCase();
+  return NUMERICAL_KEYWORDS.some((kw) => lower.includes(kw));
+}
 
 const CandidateAssessment = () => {
   const { id: assessmentId } = useParams<{ id: string }>();
@@ -297,7 +312,11 @@ const CandidateAssessment = () => {
               <div className="glass-card p-6">
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-xs text-muted-foreground">Question {currentQ + 1} of {aptitudeQuestions.length}</span>
-                  <Badge variant="outline" className="text-xs">Aptitude</Badge>
+                  {isNumericalQuestion(q.question_text) ? (
+                    <Badge variant="outline" className="text-xs gap-1"><Calculator className="h-3 w-3" /> Numerical</Badge>
+                  ) : (
+                    <Badge variant="outline" className="text-xs gap-1"><Code className="h-3 w-3" /> Technical</Badge>
+                  )}
                 </div>
                 <h3 className="text-lg font-medium mb-6">{q.question_text}</h3>
                 <RadioGroup value={answers[q.id] || ""} onValueChange={(v) => setAnswers({ ...answers, [q.id]: v })}>
