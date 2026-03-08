@@ -16,29 +16,6 @@ import type { Tables } from "@/integrations/supabase/types";
 
 type Phase = "register" | "aptitude" | "coding" | "evaluating" | "submitted";
 
-const NUMERICAL_KEYWORDS = [
-  "percentage", "percent", "ratio", "proportion", "profit", "loss", "interest",
-  "time and work", "speed", "distance", "average", "probability", "permutation",
-  "combination", "series", "sequence", "number series", "arithmetic", "geometric",
-  "factorial", "lcm", "hcf", "gcd", "divisible", "remainder", "modulo",
-  "train", "pipe", "cistern", "age", "mixture", "alligation", "boat", "stream",
-  "compound interest", "simple interest", "discount", "marked price",
-  "how many", "find the value", "what is the sum", "calculate",
-  "days", "salary", "wages", "cost", "price", "sold", "buys", "sells",
-  "liters", "litres", "gallons", "meters", "kilometres", "km/h", "mph",
-  "complete a task", "finish the work", "working together", "can do",
-  "workers", "men and women", "efficiency",
-];
-
-function isNumericalQuestion(text: string): boolean {
-  const lower = text.toLowerCase();
-  // If it contains code-related markers, it's technical regardless
-  if (/`[^`]+`/.test(text) || lower.includes("output of") || lower.includes("syntax") || lower.includes("function") && lower.includes("return")) {
-    return false;
-  }
-  return NUMERICAL_KEYWORDS.some((kw) => lower.includes(kw));
-}
-
 const CandidateAssessment = () => {
   const { id: assessmentId } = useParams<{ id: string }>();
   const [phase, setPhase] = useState<Phase>("register");
