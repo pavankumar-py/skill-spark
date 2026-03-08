@@ -136,7 +136,7 @@ const EvaluateCandidates = () => {
                 {filtered.map((c, i) => (
                   <motion.tr key={c.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.03 }} className="border-b last:border-0 hover:bg-secondary/30 transition-colors">
                     <td className="p-3"><Checkbox checked={selected.includes(c.id)} onCheckedChange={() => toggleSelect(c.id)} /></td>
-                    <td className="p-3 font-medium">{c.name}</td>
+                    <td className="p-3 font-medium cursor-pointer hover:text-primary transition-colors" onClick={() => navigate(`/app/evaluate/${c.id}`)}>{c.name}</td>
                     <td className="p-3 text-muted-foreground">{c.email}</td>
                     <td className="p-3 text-muted-foreground text-xs">{c.assessmentName}</td>
                     <td className="p-3 text-center">{c.aptitudeScore}</td>
