@@ -94,7 +94,7 @@ const Login = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="space-y-3 mb-10"
+              className="space-y-3 mb-10 inline-flex flex-col items-start"
             >
               {features.map((f, i) => (
                 <motion.div
