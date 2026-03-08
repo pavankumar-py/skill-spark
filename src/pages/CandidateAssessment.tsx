@@ -315,11 +315,6 @@ const CandidateAssessment = () => {
               <div className="glass-card p-6">
                 <div className="flex items-center justify-between mb-4">
                   <span className="text-xs text-muted-foreground">Question {currentQ + 1} of {aptitudeQuestions.length}</span>
-                  {isNumericalQuestion(q.question_text) ? (
-                    <Badge variant="outline" className="text-xs gap-1"><Calculator className="h-3 w-3" /> Numerical</Badge>
-                  ) : (
-                    <Badge variant="outline" className="text-xs gap-1"><Code className="h-3 w-3" /> Technical</Badge>
-                  )}
                 </div>
                 <h3 className="text-lg font-medium mb-6">{q.question_text}</h3>
                 <RadioGroup value={answers[q.id] || ""} onValueChange={(v) => setAnswers({ ...answers, [q.id]: v })}>
