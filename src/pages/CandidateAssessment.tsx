@@ -213,6 +213,34 @@ const CandidateAssessment = () => {
   })();
   const currentCode = code[`${cq?.id}-${language}`] || starterCode?.[language] || "";
 
+  if (phase === "evaluating") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="glass-card p-8 text-center max-w-md">
+          <div className="relative h-16 w-16 mx-auto mb-6">
+            <motion.div
+              className="absolute inset-0 rounded-full border-4 border-primary/20"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+              style={{ borderTopColor: "hsl(var(--primary))" }}
+            />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Brain className="h-6 w-6 text-primary" />
+            </div>
+          </div>
+          <h2 className="text-xl font-semibold mb-2">Evaluating Your Assessment</h2>
+          <p className="text-muted-foreground text-sm mb-4">Our AI is analyzing your responses and code submissions...</p>
+          <div className="space-y-2">
+            <motion.div initial={{ width: 0 }} animate={{ width: "100%" }} transition={{ duration: 8, ease: "easeInOut" }}>
+              <Progress value={undefined} className="h-1.5" />
+            </motion.div>
+            <p className="text-xs text-muted-foreground">This may take a few moments</p>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
   if (phase === "submitted") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
