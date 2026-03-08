@@ -5,9 +5,32 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
-import { ArrowLeft, Brain, Code, Trophy, FileText, User, Mail, Clock } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { ArrowLeft, Brain, Code, Trophy, FileText, Mail, Clock, Calculator } from "lucide-react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
+
+const NUMERICAL_KEYWORDS = [
+  "percentage", "percent", "ratio", "proportion", "profit", "loss", "interest",
+  "time and work", "speed", "distance", "average", "probability", "permutation",
+  "combination", "series", "sequence", "number series", "arithmetic", "geometric",
+  "factorial", "lcm", "hcf", "gcd", "divisible", "remainder", "modulo",
+  "train", "pipe", "cistern", "age", "mixture", "alligation", "boat", "stream",
+  "compound interest", "simple interest", "discount", "marked price",
+  "how many", "find the value", "what is the sum", "calculate",
+  "days", "salary", "wages", "cost", "price", "sold", "buys", "sells",
+  "liters", "litres", "gallons", "meters", "kilometres", "km/h", "mph",
+  "complete a task", "finish the work", "working together", "can do",
+  "workers", "men and women", "efficiency",
+];
+
+function isNumericalQuestion(text: string): boolean {
+  const lower = text.toLowerCase();
+  if (/`[^`]+`/.test(text) || lower.includes("output of") || lower.includes("syntax") || (lower.includes("function") && lower.includes("return"))) {
+    return false;
+  }
+  return NUMERICAL_KEYWORDS.some((kw) => lower.includes(kw));
+}
 
 interface ReportData {
   candidate: { full_name: string; email: string; phone: string | null; started_at: string | null; completed_at: string | null };
