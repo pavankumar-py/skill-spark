@@ -4,9 +4,10 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Send, Filter, ArrowUpDown, Search } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import { Send, Filter, ArrowUpDown, Search, CheckCircle, XCircle, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
@@ -24,7 +25,7 @@ interface CandidateRow {
 }
 
 const EvaluateCandidates = () => {
-  const { companyId } = useAuth();
+  const { companyId, companyName } = useAuth();
   const navigate = useNavigate();
   const [candidates, setCandidates] = useState<CandidateRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -33,7 +34,12 @@ const EvaluateCandidates = () => {
   const [filterPercent, setFilterPercent] = useState<string>("all");
   const [minScore, setMinScore] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [showComingSoon, setShowComingSoon] = useState(false);
+
+  // Smart Send state
+  const [showSmartSend, setShowSmartSend] = useState(false);
+  const [sendAction, setSendAction] = useState<"shortlisted" | "rejected">("shortlisted");
+  const [customMessage, setCustomMessage] = useState("");
+  const [sending, setSending] = useState(false);
 
   useEffect(() => {
     if (!companyId) return;
@@ -81,7 +87,48 @@ const EvaluateCandidates = () => {
 
   const toggleSelect = (id: string) => setSelected((s) => s.includes(id) ? s.filter((i) => i !== id) : [...s, id]);
   const toggleAll = () => setSelected(selected.length === filtered.length ? [] : filtered.map((c) => c.id));
-  const openSmartSend = () => setShowComingSoon(true);
+
+  const openSmartSend = () => {
+    setSendAction("shortlisted");
+    setCustomMessage("");
+    setShowSmartSend(true);
+  };
+
+  const handleSend = async () => {
+    const selectedCandidates = candidates
+      .filter((c) => selected.includes(c.id))
+      .map((c) => ({ id: c.id, name: c.name, email: c.email, totalScore: c.totalScore, assessmentName: c.assessmentName }));
+
+    if (!selectedCandidates.length) return;
+
+    setSending(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("send-candidate-emails", {
+        body: {
+          candidates: selectedCandidates,
+          action: sendAction,
+          customMessage: customMessage.trim() || null,
+          companyName: companyName || "Hiring Team",
+        },
+      });
+
+      if (error) throw error;
+
+      const { successCount, totalCount } = data;
+      if (successCount === totalCount) {
+        toast.success(`Successfully sent ${successCount} ${sendAction} email${successCount > 1 ? "s" : ""}!`);
+      } else {
+        toast.warning(`Sent ${successCount}/${totalCount} emails. Some failed.`);
+      }
+      setShowSmartSend(false);
+      setSelected([]);
+    } catch (err) {
+      console.error("Smart Send error:", err);
+      toast.error("Failed to send emails. Please try again.");
+    } finally {
+      setSending(false);
+    }
+  };
 
   if (loading) return <div className="p-6 text-muted-foreground">Loading...</div>;
 
@@ -147,11 +194,73 @@ const EvaluateCandidates = () => {
         </div>
       )}
 
-      <Dialog open={showComingSoon} onOpenChange={setShowComingSoon}>
-        <DialogContent className="max-w-sm text-center">
-          <DialogHeader><DialogTitle>Coming Soon</DialogTitle></DialogHeader>
-          <p className="text-sm text-muted-foreground py-2">This feature will be available in the future. You'll be notified when it releases.</p>
-          <DialogFooter className="justify-center"><Button onClick={() => setShowComingSoon(false)}>Got it</Button></DialogFooter>
+      {/* Smart Send Dialog */}
+      <Dialog open={showSmartSend} onOpenChange={setShowSmartSend}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Send className="h-5 w-5" /> Smart Send
+            </DialogTitle>
+            <DialogDescription>
+              Send {sendAction === "shortlisted" ? "shortlist" : "rejection"} emails to {selected.length} selected candidate{selected.length > 1 ? "s" : ""}.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            <div>
+              <label className="text-sm font-medium mb-2 block">Action</label>
+              <div className="flex gap-2">
+                <Button
+                  type="button"
+                  variant={sendAction === "shortlisted" ? "default" : "outline"}
+                  size="sm"
+                  className="flex-1"
+                  onClick={() => setSendAction("shortlisted")}
+                >
+                  <CheckCircle className="h-4 w-4 mr-1" /> Shortlist
+                </Button>
+                <Button
+                  type="button"
+                  variant={sendAction === "rejected" ? "destructive" : "outline"}
+                  size="sm"
+                  className="flex-1"
+                  onClick={() => setSendAction("rejected")}
+                >
+                  <XCircle className="h-4 w-4 mr-1" /> Reject
+                </Button>
+              </div>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium mb-2 block">Custom Message (optional)</label>
+              <Textarea
+                placeholder={sendAction === "shortlisted"
+                  ? "e.g. We'd love to schedule a follow-up interview..."
+                  : "e.g. We encourage you to apply again in the future..."}
+                value={customMessage}
+                onChange={(e) => setCustomMessage(e.target.value)}
+                rows={3}
+                className="text-sm"
+              />
+              <p className="text-xs text-muted-foreground mt-1">Leave blank to use the default {sendAction} message.</p>
+            </div>
+
+            <div className="bg-secondary/50 rounded-lg p-3">
+              <p className="text-xs font-medium mb-1">Recipients ({selected.length})</p>
+              <div className="flex flex-wrap gap-1 max-h-20 overflow-y-auto">
+                {candidates.filter((c) => selected.includes(c.id)).map((c) => (
+                  <Badge key={c.id} variant="secondary" className="text-xs">{c.name}</Badge>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowSmartSend(false)} disabled={sending}>Cancel</Button>
+            <Button onClick={handleSend} disabled={sending}>
+              {sending ? <><Loader2 className="h-4 w-4 mr-1 animate-spin" /> Sending...</> : <><Send className="h-4 w-4 mr-1" /> Send Emails</>}
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>
