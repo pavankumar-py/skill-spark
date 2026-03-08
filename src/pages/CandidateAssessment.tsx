@@ -251,7 +251,11 @@ const CandidateAssessment = () => {
             {cq.test_cases && (
               <div>
                 <h4 className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-2">Test Cases</h4>
-                {(cq.test_cases as { input: string; expectedOutput: string }[]).map((tc, i) => (
+                {(() => {
+                  let tc = cq.test_cases;
+                  if (typeof tc === "string") { try { tc = JSON.parse(tc); } catch { tc = []; } }
+                  return Array.isArray(tc) ? tc : [];
+                })().map((tc: { input: string; expectedOutput: string }, i: number) => (
                   <div key={i} className="bg-secondary/50 rounded p-3 mb-2 text-xs font-mono">
                     <div><span className="text-muted-foreground">Input:</span> {tc.input}</div>
                     <div><span className="text-muted-foreground">Output:</span> {tc.expectedOutput}</div>
