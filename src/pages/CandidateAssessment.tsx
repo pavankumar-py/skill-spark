@@ -13,7 +13,7 @@ import Editor from "@monaco-editor/react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 
-type Phase = "register" | "aptitude" | "coding" | "submitted";
+type Phase = "register" | "aptitude" | "coding" | "evaluating" | "submitted";
 
 const CandidateAssessment = () => {
   const { id: assessmentId } = useParams<{ id: string }>();
