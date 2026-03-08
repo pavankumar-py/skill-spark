@@ -12,21 +12,21 @@ serve(async (req) => {
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const { role, techStack, experience, aptitudeCount, aptitudeDifficulty, codingCount, codingDifficulty, codingTopics } = await req.json();
+    const { role, techStack, experience, technicalCount, numericalCount, aptitudeDifficulty, numericalTopics, technicalMcqTopics, codingCount, codingDifficulty, codingTopics } = await req.json();
 
-    // Generate aptitude questions - 50% technical, 50% numerical ability
-    const technicalCount = Math.ceil(aptitudeCount / 2);
-    const numericalCount = aptitudeCount - technicalCount;
-    const aptitudePrompt = `Generate exactly ${aptitudeCount} multiple-choice aptitude questions for a ${role} developer role.
+    const totalAptitude = (technicalCount || 0) + (numericalCount || 0);
+
+    // Generate aptitude questions with explicit counts and topics
+    const aptitudePrompt = `Generate exactly ${totalAptitude} multiple-choice aptitude questions for a ${role} developer role.
 Tech stack: ${techStack.join(", ") || "general programming"}.
 Experience level: ${experience || "mid-level"}.
 Difficulty: ${aptitudeDifficulty || "Medium"}.
 
-IMPORTANT: Generate a MIX of two categories:
-1. Exactly ${technicalCount} TECHNICAL MCQs — testing knowledge of ${techStack.join(", ") || "programming concepts"}, frameworks, language syntax, debugging, system design, etc.
-2. Exactly ${numericalCount} NUMERICAL ABILITY questions — testing quantitative aptitude like number series, percentages, ratios, profit/loss, time & work, probability, data interpretation, and logical reasoning with numbers.
+IMPORTANT: Generate exactly two categories in this order:
+1. Exactly ${technicalCount || 0} TECHNICAL MCQs — testing knowledge of ${techStack.join(", ") || "programming concepts"}${technicalMcqTopics?.length ? `, focusing on: ${technicalMcqTopics.join(", ")}` : ", frameworks, language syntax, debugging, system design"}.
+2. Exactly ${numericalCount || 0} NUMERICAL ABILITY questions — testing quantitative aptitude${numericalTopics?.length ? ` focusing on: ${numericalTopics.join(", ")}` : " like number series, percentages, ratios, profit/loss, time & work, probability"}.
 
-Alternate between technical and numerical questions. Do NOT generate only technical questions.`;
+Generate the technical questions first, then the numerical questions.`;
 
     const aptitudeResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
