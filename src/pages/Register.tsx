@@ -81,7 +81,7 @@ const Register = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <span className="text-4xl font-bold tracking-tight drop-shadow-lg bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-transparent">Verifyr</span>
+            <span className="text-4xl font-bold tracking-tight bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-transparent" style={{ textShadow: '0 0 30px rgba(255,255,255,0.5), 0 0 60px rgba(255,255,255,0.3), 0 0 90px rgba(255,255,255,0.2)' }}>Verifyr</span>
           </motion.div>
 
           {/* Main content */}
