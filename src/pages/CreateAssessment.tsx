@@ -261,8 +261,8 @@ const CreateAssessment = () => {
                 <div className="space-y-1"><p className="text-muted-foreground text-xs">Role</p><p className="font-medium">{form.role || "—"}</p></div>
                 <div className="space-y-1"><p className="text-muted-foreground text-xs">Experience</p><p className="font-medium">{form.experience || "—"}</p></div>
                 <div className="space-y-1"><p className="text-muted-foreground text-xs">Duration</p><p className="font-medium">{form.duration} min</p></div>
-                <div className="space-y-1"><p className="text-muted-foreground text-xs">Aptitude Questions</p><p className="font-medium">{form.aptitudeCount} ({form.aptitudeDifficulty || "—"})</p></div>
-                <div className="space-y-1"><p className="text-muted-foreground text-xs">Coding Questions</p><p className="font-medium">{form.codingCount} ({form.codingDifficulty || "—"})</p></div>
+                <div className="space-y-1"><p className="text-muted-foreground text-xs">Technical MCQs</p><p className="font-medium">{form.technicalCount} questions</p></div>
+                <div className="space-y-1"><p className="text-muted-foreground text-xs">Numerical Ability</p><p className="font-medium">{form.numericalCount} questions</p></div>
                 <div className="space-y-1 col-span-2"><p className="text-muted-foreground text-xs">Tech Stack</p><div className="flex flex-wrap gap-1">{form.techStack.length ? form.techStack.map((t) => <Badge key={t} variant="secondary" className="text-xs">{t}</Badge>) : <span className="text-muted-foreground">—</span>}</div></div>
                 <div className="space-y-1"><p className="text-muted-foreground text-xs">Anti-Cheat</p><p className="font-medium">{form.antiCheat ? "Enabled" : "Disabled"}</p></div>
                 <div className="space-y-1"><p className="text-muted-foreground text-xs">Code Execution</p><p className="font-medium">{form.allowExecution ? "Allowed" : "Disabled"}</p></div>
