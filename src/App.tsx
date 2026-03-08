@@ -14,6 +14,7 @@ import PreviousAssessments from "./pages/PreviousAssessments";
 import EvaluateCandidates from "./pages/EvaluateCandidates";
 import SettingsPage from "./pages/Settings";
 import CandidateAssessment from "./pages/CandidateAssessment";
+import CandidateReport from "./pages/CandidateReport";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -42,6 +43,7 @@ const App = () => (
               <Route path="create" element={<CreateAssessment />} />
               <Route path="assessments" element={<PreviousAssessments />} />
               <Route path="evaluate" element={<EvaluateCandidates />} />
+              <Route path="evaluate/:candidateId" element={<CandidateReport />} />
               <Route path="settings" element={<SettingsPage />} />
             </Route>
             <Route path="*" element={<NotFound />} />

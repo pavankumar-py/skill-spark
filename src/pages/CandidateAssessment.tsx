@@ -7,13 +7,14 @@ import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, ArrowLeft, Clock, AlertTriangle, Play, Zap, Send } from "lucide-react";
+import { ArrowRight, ArrowLeft, Clock, AlertTriangle, Play, Zap, Send, Brain } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import Editor from "@monaco-editor/react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 
-type Phase = "register" | "aptitude" | "coding" | "submitted";
+type Phase = "register" | "aptitude" | "coding" | "evaluating" | "submitted";
 
 const CandidateAssessment = () => {
   const { id: assessmentId } = useParams<{ id: string }>();
@@ -97,7 +98,7 @@ const CandidateAssessment = () => {
   const submitAssessment = async () => {
     if (!candidateId) return;
 
-    toast.info("Submitting and evaluating your assessment...");
+    setPhase("evaluating");
 
     // Save aptitude responses
     const aptitudeResponses = aptitudeQuestions.map((q) => ({
@@ -212,6 +213,34 @@ const CandidateAssessment = () => {
     return sc as Record<string, string> | null;
   })();
   const currentCode = code[`${cq?.id}-${language}`] || starterCode?.[language] || "";
+
+  if (phase === "evaluating") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="glass-card p-8 text-center max-w-md">
+          <div className="relative h-16 w-16 mx-auto mb-6">
+            <motion.div
+              className="absolute inset-0 rounded-full border-4 border-primary/20"
+              animate={{ rotate: 360 }}
+              transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+              style={{ borderTopColor: "hsl(var(--primary))" }}
+            />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Brain className="h-6 w-6 text-primary" />
+            </div>
+          </div>
+          <h2 className="text-xl font-semibold mb-2">Evaluating Your Assessment</h2>
+          <p className="text-muted-foreground text-sm mb-4">Our AI is analyzing your responses and code submissions...</p>
+          <div className="space-y-2">
+            <motion.div initial={{ width: 0 }} animate={{ width: "100%" }} transition={{ duration: 8, ease: "easeInOut" }}>
+              <Progress value={undefined} className="h-1.5" />
+            </motion.div>
+            <p className="text-xs text-muted-foreground">This may take a few moments</p>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
 
   if (phase === "submitted") {
     return (
