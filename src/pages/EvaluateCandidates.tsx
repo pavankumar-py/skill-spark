@@ -90,7 +90,7 @@ const EvaluateCandidates = () => {
   const toggleAll = () => setSelected(selected.length === filtered.length ? [] : filtered.map((c) => c.id));
 
   const handleSend = () => { toast.success(`Messages sent to ${selected.length} candidate(s)!`); setShowModal(false); setSelected([]); };
-  const openSmartSend = () => { setCustomMessage(messageTemplates[messageType]); setShowModal(true); };
+  const openSmartSend = () => { setShowComingSoon(true); };
 
   if (loading) return <div className="p-6 text-muted-foreground">Loading...</div>;
 
