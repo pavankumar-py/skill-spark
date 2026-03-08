@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.evaluate-candidate]
 verify_jwt = false
+
+[functions.send-candidate-emails]
+verify_jwt = false
