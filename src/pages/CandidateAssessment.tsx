@@ -149,7 +149,11 @@ const CandidateAssessment = () => {
 
   const q = aptitudeQuestions[currentQ];
   const cq = codingQuestions[currentCodingQ];
-  const starterCode = cq?.starter_code as Record<string, string> | null;
+  const starterCode = (() => {
+    let sc = cq?.starter_code;
+    if (typeof sc === "string") { try { sc = JSON.parse(sc); } catch { sc = null; } }
+    return sc as Record<string, string> | null;
+  })();
   const currentCode = code[`${cq?.id}-${language}`] || starterCode?.[language] || "";
 
   if (phase === "submitted") {
@@ -188,7 +192,7 @@ const CandidateAssessment = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="h-screen bg-background flex flex-col">
       <header className="h-12 border-b flex items-center justify-between px-4 bg-card shrink-0">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5"><div className="h-6 w-6 rounded bg-primary flex items-center justify-center"><Zap className="h-3 w-3 text-primary-foreground" /></div><span className="text-sm font-medium">AssessKit</span></div>
@@ -211,7 +215,11 @@ const CandidateAssessment = () => {
                 </div>
                 <h3 className="text-lg font-medium mb-6">{q.question_text}</h3>
                 <RadioGroup value={answers[q.id] || ""} onValueChange={(v) => setAnswers({ ...answers, [q.id]: v })}>
-                  {(Array.isArray(q.options) ? q.options : []).map((opt: string, i: number) => (
+                  {(() => {
+                    let opts = q.options;
+                    if (typeof opts === "string") { try { opts = JSON.parse(opts); } catch { opts = []; } }
+                    return Array.isArray(opts) ? opts : [];
+                  })().map((opt: string, i: number) => (
                     <div key={i} className="flex items-center space-x-3 p-3 rounded-lg border hover:bg-secondary/50 transition-colors cursor-pointer">
                       <RadioGroupItem value={String(i)} id={`opt-${i}`} />
                       <label htmlFor={`opt-${i}`} className="text-sm cursor-pointer flex-1">{opt}</label>
@@ -243,7 +251,11 @@ const CandidateAssessment = () => {
             {cq.test_cases && (
               <div>
                 <h4 className="text-xs font-medium uppercase tracking-wide text-muted-foreground mb-2">Test Cases</h4>
-                {(cq.test_cases as { input: string; expectedOutput: string }[]).map((tc, i) => (
+                {(() => {
+                  let tc = cq.test_cases;
+                  if (typeof tc === "string") { try { tc = JSON.parse(tc); } catch { tc = []; } }
+                  return Array.isArray(tc) ? tc : [];
+                })().map((tc: { input: string; expectedOutput: string }, i: number) => (
                   <div key={i} className="bg-secondary/50 rounded p-3 mb-2 text-xs font-mono">
                     <div><span className="text-muted-foreground">Input:</span> {tc.input}</div>
                     <div><span className="text-muted-foreground">Output:</span> {tc.expectedOutput}</div>
