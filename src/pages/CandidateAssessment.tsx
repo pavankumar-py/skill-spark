@@ -56,8 +56,7 @@ const CandidateAssessment = () => {
   }, [assessmentId]);
 
   // Timer - use ref to avoid stale closure
-  const submitRef = useRef(submitAssessment);
-  submitRef.current = submitAssessment;
+  const submitRef = useRef<() => Promise<void>>(async () => {});
 
   useEffect(() => {
     if (phase !== "aptitude" && phase !== "coding") return;
