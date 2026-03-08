@@ -217,7 +217,7 @@ const CandidateAssessment = () => {
   };
 
   const runCode = () => {
-    setOutput("Running code...\n\n> Test Case 1: Passed ✓\n> Test Case 2: Passed ✓\n\nAll test cases passed!");
+    setOutput("⚠ Code execution is for preview only. Your code will be evaluated by AI upon submission.");
   };
 
   if (loading) return <div className="min-h-screen flex items-center justify-center text-muted-foreground">Loading assessment...</div>;
