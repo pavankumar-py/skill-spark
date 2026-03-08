@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Send, Filter, ArrowUpDown, Search } from "lucide-react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
@@ -81,7 +82,13 @@ const EvaluateCandidates = () => {
   const toggleSelect = (id: string) => setSelected((s) => s.includes(id) ? s.filter((i) => i !== id) : [...s, id]);
   const toggleAll = () => setSelected(selected.length === filtered.length ? [] : filtered.map((c) => c.id));
 
-  if (loading) return <div className="p-6 text-muted-foreground">Loading...</div>;
+  if (loading) return (
+    <div className="p-6 max-w-7xl mx-auto space-y-4">
+      <Skeleton className="h-8 w-56" />
+      <Skeleton className="h-4 w-72" />
+      <div className="space-y-2 mt-6">{[1,2,3].map(i => <Skeleton key={i} className="h-12 rounded-lg" />)}</div>
+    </div>
+  );
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
@@ -108,7 +115,11 @@ const EvaluateCandidates = () => {
       </div>
 
       {candidates.length === 0 ? (
-        <div className="glass-card p-12 text-center text-muted-foreground">No completed candidates yet.</div>
+        <div className="glass-card p-12 text-center">
+          <Search className="h-10 w-10 text-muted-foreground/50 mx-auto mb-3" />
+          <h3 className="font-medium mb-1">No completed candidates yet</h3>
+          <p className="text-sm text-muted-foreground">Share your assessment links with candidates. Once they complete assessments, their results will appear here.</p>
+        </div>
       ) : (
         <div className="glass-card overflow-hidden">
           <div className="overflow-x-auto">

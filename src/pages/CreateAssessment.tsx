@@ -43,7 +43,16 @@ const CreateAssessment = () => {
 
   const toggleArrayItem = (arr: string[], item: string) =>
     arr.includes(item) ? arr.filter((i) => i !== item) : [...arr, item];
-  const next = () => setStep((s) => Math.min(s + 1, 4));
+  const canProceed = (s: number): boolean => {
+    if (s === 0) return !!(form.title.trim() && form.role && form.experience && form.techStack.length > 0);
+    if (s === 1) return !!(form.aptitudeDifficulty && (Number(form.technicalCount) + Number(form.numericalCount)) > 0);
+    if (s === 2) return !!(form.codingDifficulty && Number(form.codingCount) > 0);
+    return true;
+  };
+  const next = () => {
+    if (!canProceed(step)) { toast.error("Please fill all required fields before proceeding."); return; }
+    setStep((s) => Math.min(s + 1, 4));
+  };
   const prev = () => setStep((s) => Math.max(s - 1, 0));
 
   const handleCreate = async () => {

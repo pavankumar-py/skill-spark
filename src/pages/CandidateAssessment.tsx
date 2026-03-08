@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -55,10 +55,12 @@ const CandidateAssessment = () => {
     load();
   }, [assessmentId]);
 
-  // Timer
+  // Timer - use ref to avoid stale closure
+  const submitRef = useRef<() => Promise<void>>(async () => {});
+
   useEffect(() => {
     if (phase !== "aptitude" && phase !== "coding") return;
-    const timer = setInterval(() => setTimeLeft((t) => { if (t <= 1) { submitAssessment(); return 0; } return t - 1; }), 1000);
+    const timer = setInterval(() => setTimeLeft((t) => { if (t <= 1) { submitRef.current(); return 0; } return t - 1; }), 1000);
     return () => clearInterval(timer);
   }, [phase]);
 
@@ -83,6 +85,14 @@ const CandidateAssessment = () => {
   const startAssessment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!assessmentId) return;
+
+    // Check for duplicate candidate
+    const { data: existing } = await supabase.from("candidates").select("id").eq("assessment_id", assessmentId).eq("email", candidate.email);
+    if (existing && existing.length > 0) {
+      toast.error("You have already registered for this assessment.");
+      return;
+    }
+
     const { data, error } = await supabase.from("candidates").insert({
       assessment_id: assessmentId,
       full_name: candidate.name,
@@ -217,6 +227,9 @@ const CandidateAssessment = () => {
     setPhase("submitted");
     toast.success("Assessment submitted and evaluated!");
   };
+
+  // Keep ref updated for timer
+  submitRef.current = submitAssessment;
 
   const runCode = () => {
     setOutput("⚠ Code execution is for preview only. Your code will be evaluated by AI upon submission.");

@@ -5,6 +5,7 @@ import { FileText, Users, TrendingUp, Trophy, FilePlus, ArrowRight } from "lucid
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
+import { Skeleton } from "@/components/ui/skeleton";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, AreaChart, Area } from "recharts";
 
 const Dashboard = () => {
@@ -81,7 +82,17 @@ const Dashboard = () => {
     { label: "Top Score", value: stats.topScore, icon: Trophy },
   ];
 
-  if (loading) return <div className="p-6 text-muted-foreground">Loading...</div>;
+  if (loading) return (
+    <div className="p-6 max-w-7xl mx-auto space-y-6">
+      <div><Skeleton className="h-8 w-48 mb-2" /><Skeleton className="h-4 w-64" /></div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[1,2,3,4].map(i => <Skeleton key={i} className="h-24 rounded-lg" />)}
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <Skeleton className="h-64 rounded-lg" /><Skeleton className="h-64 rounded-lg" />
+      </div>
+    </div>
+  );
 
   // Empty state
   if (stats.totalAssessments === 0) {
