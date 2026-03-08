@@ -408,7 +408,7 @@ const CandidateAssessment = () => {
     <div className="h-screen bg-background flex flex-col">
       <header className="h-12 border-b flex items-center justify-between px-4 bg-card shrink-0">
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-1.5"><div className="h-6 w-6 rounded bg-primary flex items-center justify-center"><Zap className="h-3 w-3 text-primary-foreground" /></div><span className="text-sm font-medium">AssessKit</span></div>
+          <div className="flex items-center gap-1.5"><div className="h-6 w-6 rounded bg-primary flex items-center justify-center"><Zap className="h-3 w-3 text-primary-foreground" /></div><span className="text-sm font-medium">Verifyr</span></div>
           <Badge variant="secondary" className="text-xs">{phase === "aptitude" ? "Aptitude" : "Coding"}</Badge>
         </div>
         <div className="flex items-center gap-3">
