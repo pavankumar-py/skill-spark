@@ -1,26 +1,28 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { FileText, Users, TrendingUp, Trophy } from "lucide-react";
+import { FileText, Users, TrendingUp, Trophy, FilePlus, ArrowRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, AreaChart, Area } from "recharts";
 
 const Dashboard = () => {
   const { companyId } = useAuth();
+  const navigate = useNavigate();
   const [stats, setStats] = useState({ totalAssessments: 0, totalCandidates: 0, avgScore: 0, topScore: 0 });
   const [scoreData, setScoreData] = useState<{ range: string; count: number }[]>([]);
   const [assessmentTimeline, setAssessmentTimeline] = useState<{ month: string; count: number }[]>([]);
   const [participationData, setParticipationData] = useState<{ month: string; candidates: number }[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!companyId) return;
 
     const fetchData = async () => {
-      // Assessments count
       const { data: assessments } = await supabase.from("assessments").select("id, created_at").eq("company_id", companyId);
       const totalAssessments = assessments?.length || 0;
 
-      // Candidates with scores
       const assessmentIds = assessments?.map((a) => a.id) || [];
       let totalCandidates = 0;
       let avgScore = 0;
@@ -41,7 +43,6 @@ const Dashboard = () => {
           }
         }
 
-        // Participation by month
         const monthMap: Record<string, number> = {};
         candidates?.forEach((c) => {
           const m = new Date(c.created_at).toLocaleString("en", { month: "short", year: "2-digit" });
@@ -50,7 +51,6 @@ const Dashboard = () => {
         setParticipationData(Object.entries(monthMap).map(([month, candidates]) => ({ month, candidates })));
       }
 
-      // Score distribution
       const ranges = [
         { range: "0-20", min: 0, max: 20 },
         { range: "21-40", min: 21, max: 40 },
@@ -60,7 +60,6 @@ const Dashboard = () => {
       ];
       setScoreData(ranges.map((r) => ({ range: r.range, count: scores.filter((s) => s >= r.min && s <= r.max).length })));
 
-      // Assessments by month
       const aMonthMap: Record<string, number> = {};
       assessments?.forEach((a) => {
         const m = new Date(a.created_at).toLocaleString("en", { month: "short", year: "2-digit" });
@@ -69,6 +68,7 @@ const Dashboard = () => {
       setAssessmentTimeline(Object.entries(aMonthMap).map(([month, count]) => ({ month, count })));
 
       setStats({ totalAssessments, totalCandidates, avgScore, topScore });
+      setLoading(false);
     };
 
     fetchData();
@@ -80,6 +80,28 @@ const Dashboard = () => {
     { label: "Average Score", value: stats.avgScore, icon: TrendingUp },
     { label: "Top Score", value: stats.topScore, icon: Trophy },
   ];
+
+  if (loading) return <div className="p-6 text-muted-foreground">Loading...</div>;
+
+  // Empty state
+  if (stats.totalAssessments === 0) {
+    return (
+      <div className="p-6 max-w-7xl mx-auto">
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+          <h1 className="text-2xl font-semibold mb-1">Dashboard</h1>
+          <p className="text-muted-foreground text-sm mb-8">Overview of your hiring assessments</p>
+        </motion.div>
+        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} className="glass-card p-12 text-center max-w-lg mx-auto">
+          <div className="h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
+            <FilePlus className="h-7 w-7 text-primary" />
+          </div>
+          <h2 className="text-xl font-semibold mb-2">No assessments yet</h2>
+          <p className="text-muted-foreground text-sm mb-6">Create your first assessment to start evaluating candidates with AI-powered questions.</p>
+          <Button onClick={() => navigate("/app/create")}>Create Assessment <ArrowRight className="ml-2 h-4 w-4" /></Button>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 max-w-7xl mx-auto space-y-6">

@@ -5,12 +5,16 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
+import Index from "./pages/Index";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import AppLayout from "./components/AppLayout";
 import Dashboard from "./pages/Dashboard";
 import CreateAssessment from "./pages/CreateAssessment";
 import PreviousAssessments from "./pages/PreviousAssessments";
+import AssessmentDetail from "./pages/AssessmentDetail";
 import EvaluateCandidates from "./pages/EvaluateCandidates";
 import SettingsPage from "./pages/Settings";
 import CandidateAssessment from "./pages/CandidateAssessment";
@@ -27,9 +31,11 @@ const App = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="/" element={<Index />} />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/reset-password" element={<ResetPassword />} />
             <Route path="/take/:id" element={<CandidateAssessment />} />
             <Route
               path="/app"
@@ -42,6 +48,7 @@ const App = () => (
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="create" element={<CreateAssessment />} />
               <Route path="assessments" element={<PreviousAssessments />} />
+              <Route path="assessments/:assessmentId" element={<AssessmentDetail />} />
               <Route path="evaluate" element={<EvaluateCandidates />} />
               <Route path="evaluate/:candidateId" element={<CandidateReport />} />
               <Route path="settings" element={<SettingsPage />} />

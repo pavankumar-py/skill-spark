@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,6 +14,22 @@ const SettingsPage = () => {
   const [industry, setIndustry] = useState("");
   const [website, setWebsite] = useState("");
   const [saving, setSaving] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+
+  // Load existing values from DB
+  useEffect(() => {
+    if (!companyId || loaded) return;
+    const load = async () => {
+      const { data } = await supabase.from("companies").select("company_name, industry, website").eq("id", companyId).single();
+      if (data) {
+        setName(data.company_name || "");
+        setIndustry(data.industry || "");
+        setWebsite(data.website || "");
+      }
+      setLoaded(true);
+    };
+    load();
+  }, [companyId, loaded]);
 
   const handleSave = async () => {
     if (!companyId) return;
