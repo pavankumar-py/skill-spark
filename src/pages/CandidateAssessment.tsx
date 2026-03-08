@@ -7,14 +7,14 @@ import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowRight, ArrowLeft, Clock, AlertTriangle, Play, Zap, Send, Brain } from "lucide-react";
+import { ArrowRight, ArrowLeft, Clock, AlertTriangle, Play, Zap, Send, Brain, ShieldCheck, BookOpen, Timer, CheckCircle2, XOctagon, Sparkles } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
 import Editor from "@monaco-editor/react";
 import { supabase } from "@/integrations/supabase/client";
 import type { Tables } from "@/integrations/supabase/types";
 
-type Phase = "register" | "aptitude" | "coding" | "evaluating" | "submitted";
+type Phase = "register" | "instructions" | "aptitude" | "coding" | "evaluating" | "submitted";
 
 const CandidateAssessment = () => {
   const { id: assessmentId } = useParams<{ id: string }>();
@@ -92,7 +92,7 @@ const CandidateAssessment = () => {
 
     if (error || !data) { toast.error("Failed to register"); return; }
     setCandidateId(data.id);
-    setPhase(aptitudeQuestions.length > 0 ? "aptitude" : "coding");
+    setPhase("instructions");
   };
 
   const submitAssessment = async () => {
@@ -272,6 +272,10 @@ const CandidateAssessment = () => {
     );
   }
 
+  const beginAssessment = () => {
+    setPhase(aptitudeQuestions.length > 0 ? "aptitude" : "coding");
+  };
+
   if (phase === "register") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background p-4">
@@ -289,6 +293,88 @@ const CandidateAssessment = () => {
               <div className="space-y-2"><Label>Phone</Label><Input required value={candidate.phone} onChange={(e) => setCandidate({ ...candidate, phone: e.target.value })} placeholder="+1234567890" /></div>
               <Button type="submit" className="w-full">Start Assessment <ArrowRight className="ml-2 h-4 w-4" /></Button>
             </form>
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
+
+  if (phase === "instructions") {
+    const sections: { icon: React.ReactNode; label: string; count: number }[] = [];
+    if (aptitudeQuestions.length > 0) sections.push({ icon: <BookOpen className="h-4 w-4" />, label: "Aptitude / MCQ", count: aptitudeQuestions.length });
+    if (codingQuestions.length > 0) sections.push({ icon: <Play className="h-4 w-4" />, label: "Coding Challenges", count: codingQuestions.length });
+
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background p-4">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full max-w-lg">
+          <div className="flex items-center gap-2 mb-8 justify-center">
+            <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center"><Zap className="h-4 w-4 text-primary-foreground" /></div>
+            <span className="text-xl font-semibold">AssessKit</span>
+          </div>
+          <div className="glass-card p-6 space-y-6">
+            <div className="text-center">
+              <h2 className="text-xl font-semibold mb-1">Assessment Instructions</h2>
+              <p className="text-muted-foreground text-sm">Please read carefully before you begin</p>
+            </div>
+
+            {/* Test Pattern */}
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-2">
+                <BookOpen className="h-4 w-4" /> Test Pattern
+              </h3>
+              <div className="grid gap-2">
+                {sections.map((s, i) => (
+                  <div key={i} className="flex items-center justify-between p-3 rounded-lg border bg-secondary/30">
+                    <div className="flex items-center gap-2 text-sm font-medium">{s.icon} {s.label}</div>
+                    <Badge variant="secondary">{s.count} question{s.count > 1 ? "s" : ""}</Badge>
+                  </div>
+                ))}
+                <div className="flex items-center justify-between p-3 rounded-lg border bg-secondary/30">
+                  <div className="flex items-center gap-2 text-sm font-medium"><Timer className="h-4 w-4" /> Total Duration</div>
+                  <Badge variant="secondary">{assessment.duration_minutes} minutes</Badge>
+                </div>
+              </div>
+            </div>
+
+            {/* Rules */}
+            <div className="space-y-3">
+              <h3 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground flex items-center gap-2">
+                <ShieldCheck className="h-4 w-4" /> Important Rules
+              </h3>
+              <ul className="space-y-2 text-sm">
+                <li className="flex items-start gap-2">
+                  <XOctagon className="h-4 w-4 text-destructive mt-0.5 shrink-0" />
+                  <span><strong>Do not switch tabs</strong> or leave this window. Tab switches are monitored and logged.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <XOctagon className="h-4 w-4 text-destructive mt-0.5 shrink-0" />
+                  <span><strong>Do not copy-paste</strong> from external sources. Your work must be original.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                  <span>The timer starts once you click "Begin Assessment." Manage your time wisely.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                  <span>All answers are auto-saved. You can navigate between questions freely.</span>
+                </li>
+                <li className="flex items-start gap-2">
+                  <CheckCircle2 className="h-4 w-4 text-primary mt-0.5 shrink-0" />
+                  <span>Your coding submissions will be evaluated by AI — focus on correctness and clarity.</span>
+                </li>
+              </ul>
+            </div>
+
+            {/* Good luck */}
+            <div className="text-center p-4 rounded-lg bg-primary/5 border border-primary/10">
+              <Sparkles className="h-5 w-5 text-primary mx-auto mb-2" />
+              <p className="text-sm font-medium">Good luck, {candidate.name.split(" ")[0]}! 🎯</p>
+              <p className="text-xs text-muted-foreground mt-1">Stay focused, take your time, and do your best.</p>
+            </div>
+
+            <Button onClick={beginAssessment} className="w-full" size="lg">
+              Begin Assessment <ArrowRight className="ml-2 h-4 w-4" />
+            </Button>
           </div>
         </motion.div>
       </div>
