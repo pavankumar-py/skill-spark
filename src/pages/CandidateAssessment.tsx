@@ -149,7 +149,11 @@ const CandidateAssessment = () => {
 
   const q = aptitudeQuestions[currentQ];
   const cq = codingQuestions[currentCodingQ];
-  const starterCode = cq?.starter_code as Record<string, string> | null;
+  const starterCode = (() => {
+    let sc = cq?.starter_code;
+    if (typeof sc === "string") { try { sc = JSON.parse(sc); } catch { sc = null; } }
+    return sc as Record<string, string> | null;
+  })();
   const currentCode = code[`${cq?.id}-${language}`] || starterCode?.[language] || "";
 
   if (phase === "submitted") {
