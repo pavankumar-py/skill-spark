@@ -59,7 +59,7 @@ const Login = () => {
           transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
         />
 
-        <div className="relative z-10 flex flex-col justify-between p-12 w-full">
+        <div className="relative z-10 flex flex-col justify-center items-center p-12 w-full h-full">
           {/* Logo */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
