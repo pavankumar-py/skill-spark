@@ -55,10 +55,13 @@ const CandidateAssessment = () => {
     load();
   }, [assessmentId]);
 
-  // Timer
+  // Timer - use ref to avoid stale closure
+  const submitRef = useRef(submitAssessment);
+  submitRef.current = submitAssessment;
+
   useEffect(() => {
     if (phase !== "aptitude" && phase !== "coding") return;
-    const timer = setInterval(() => setTimeLeft((t) => { if (t <= 1) { submitAssessment(); return 0; } return t - 1; }), 1000);
+    const timer = setInterval(() => setTimeLeft((t) => { if (t <= 1) { submitRef.current(); return 0; } return t - 1; }), 1000);
     return () => clearInterval(timer);
   }, [phase]);
 
