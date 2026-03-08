@@ -81,7 +81,13 @@ const EvaluateCandidates = () => {
   const toggleSelect = (id: string) => setSelected((s) => s.includes(id) ? s.filter((i) => i !== id) : [...s, id]);
   const toggleAll = () => setSelected(selected.length === filtered.length ? [] : filtered.map((c) => c.id));
 
-  if (loading) return <div className="p-6 text-muted-foreground">Loading...</div>;
+  if (loading) return (
+    <div className="p-6 max-w-7xl mx-auto space-y-4">
+      <Skeleton className="h-8 w-56" />
+      <Skeleton className="h-4 w-72" />
+      <div className="space-y-2 mt-6">{[1,2,3].map(i => <Skeleton key={i} className="h-12 rounded-lg" />)}</div>
+    </div>
+  );
 
   return (
     <div className="p-6 max-w-7xl mx-auto">
