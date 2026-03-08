@@ -66,7 +66,7 @@ const Login = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <span className="text-4xl font-bold text-white tracking-tight drop-shadow-lg">Verifyr</span>
+            <span className="text-4xl font-bold tracking-tight drop-shadow-lg bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-transparent">Verifyr</span>
           </motion.div>
 
           {/* Main content */}
