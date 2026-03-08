@@ -193,25 +193,43 @@ const CandidateAssessment = () => {
       console.error("AI evaluation failed, using fallback scoring:", e);
     }
 
-    // Fallback scoring if AI fails
+    // Mark coding responses as correct/incorrect based on AI feedback (≥50% = correct)
+    if (evaluation?.coding_feedback && codingQuestions.length > 0) {
+      for (const fb of evaluation.coding_feedback) {
+        const q = codingQuestions.find((cq) => (cq.coding_title || "Untitled") === fb.question_title);
+        if (q) {
+          await supabase.from("candidate_responses")
+            .update({ is_correct: fb.score >= 50 })
+            .eq("candidate_id", candidateId)
+            .eq("question_id", q.id);
+        }
+      }
+    }
+
+    // Compute marks-based scores: 1 mark per correct answer
+    const correctAptitude = aptitudeResponses.filter((r) => r.is_correct).length;
+    const codingCorrect = evaluation?.coding_feedback
+      ? evaluation.coding_feedback.filter((fb: { score: number }) => fb.score >= 50).length
+      : 0;
+    const totalMarks = correctAptitude + codingCorrect;
+    const totalPossible = aptitudeQuestions.length + codingQuestions.length;
+    const totalPercent = totalPossible > 0 ? Math.round((totalMarks / totalPossible) * 100) : 0;
+
+    // Fallback if AI failed
     if (!evaluation) {
-      const correctAptitude = aptitudeResponses.filter((r) => r.is_correct).length;
-      const aptitudeScore = aptitudeQuestions.length > 0 ? Math.round((correctAptitude / aptitudeQuestions.length) * 100) : 0;
-      const codingScore = 0;
-      const totalScore = aptitudeQuestions.length > 0 ? aptitudeScore : codingScore;
       evaluation = {
-        aptitude_score: aptitudeScore,
-        coding_score: codingScore,
-        total_score: totalScore,
-        ai_summary: `Aptitude: ${aptitudeScore}% (${aptitudeResponses.filter((r) => r.is_correct).length}/${aptitudeQuestions.length} correct). Coding evaluation unavailable.`,
+        aptitude_score: correctAptitude,
+        coding_score: 0,
+        total_score: totalPercent,
+        ai_summary: `Aptitude: ${correctAptitude}/${aptitudeQuestions.length} correct. Coding evaluation unavailable.`,
       };
     }
 
     await supabase.from("candidate_scores").insert({
       candidate_id: candidateId,
-      aptitude_score: evaluation.aptitude_score,
-      coding_score: evaluation.coding_score,
-      total_score: evaluation.total_score,
+      aptitude_score: correctAptitude,
+      coding_score: codingCorrect,
+      total_score: totalPercent,
       ai_summary: evaluation.ai_summary,
     });
 

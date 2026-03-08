@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { ArrowLeft, Brain, Code, Trophy, FileText, Mail, Clock, Calculator } from "lucide-react";
+import { ArrowLeft, Brain, Code, Trophy, FileText, Mail, Clock, Calculator, CheckCircle2, XCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -37,7 +37,7 @@ interface ReportData {
   assessment: { title: string; role: string; tech_stack: string[]; experience_level: string | null };
   scores: { aptitude_score: number; coding_score: number; total_score: number; ai_summary: string };
   aptitudeResponses: { question_text: string; options: string[]; correct_answer: number; candidate_answer: number | null; is_correct: boolean }[];
-  codingResponses: { title: string; description: string; code: string | null; language: string | null }[];
+  codingResponses: { title: string; description: string; code: string | null; language: string | null; is_correct: boolean | null }[];
 }
 
 const CandidateReport = () => {
@@ -84,6 +84,7 @@ const CandidateReport = () => {
           description: q.coding_description || "",
           code: r?.code_answer || null,
           language: r?.language || null,
+          is_correct: r?.is_correct ?? null,
         };
       });
 
@@ -103,8 +104,8 @@ const CandidateReport = () => {
     return (
       <div className="p-6 max-w-5xl mx-auto space-y-6">
         <Skeleton className="h-8 w-48" />
-        <div className="grid grid-cols-3 gap-4">
-          <Skeleton className="h-32" /><Skeleton className="h-32" /><Skeleton className="h-32" />
+        <div className="grid grid-cols-4 gap-4">
+          <Skeleton className="h-32" /><Skeleton className="h-32" /><Skeleton className="h-32" /><Skeleton className="h-32" />
         </div>
         <Skeleton className="h-48" />
       </div>
@@ -114,10 +115,26 @@ const CandidateReport = () => {
   if (!report) return <div className="p-6 text-muted-foreground">Candidate not found.</div>;
 
   const { candidate, assessment, scores, aptitudeResponses, codingResponses } = report;
-  const scoreColor = (s: number) => s >= 80 ? "text-green-500" : s >= 60 ? "text-yellow-500" : "text-destructive";
+
+  // Compute marks breakdown
+  const classifiedAptitude = aptitudeResponses.map((r, i) => ({ ...r, index: i, isNumerical: isNumericalQuestion(r.question_text) }));
+  const technicalQs = classifiedAptitude.filter((r) => !r.isNumerical);
+  const numericalQs = classifiedAptitude.filter((r) => r.isNumerical);
+  const technicalCorrect = technicalQs.filter((r) => r.is_correct).length;
+  const numericalCorrect = numericalQs.filter((r) => r.is_correct).length;
+  const codingCorrect = codingResponses.filter((r) => r.is_correct === true).length;
+  const totalMarks = technicalCorrect + numericalCorrect + codingCorrect;
+  const totalPossible = technicalQs.length + numericalQs.length + codingResponses.length;
+
   const duration = candidate.started_at && candidate.completed_at
     ? Math.round((new Date(candidate.completed_at).getTime() - new Date(candidate.started_at).getTime()) / 60000)
     : null;
+
+  const marksBadge = (correct: number, total: number) => {
+    if (total === 0) return "text-muted-foreground";
+    const pct = (correct / total) * 100;
+    return pct >= 80 ? "text-green-500" : pct >= 50 ? "text-yellow-500" : "text-destructive";
+  };
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
@@ -138,25 +155,63 @@ const CandidateReport = () => {
           <Badge variant="outline" className="text-xs">{assessment.title} • {assessment.role}</Badge>
         </div>
 
-        {/* Score Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          {[
-            { label: "Aptitude", score: scores.aptitude_score, icon: Brain, color: "from-blue-500/10 to-blue-500/5" },
-            { label: "Coding", score: scores.coding_score, icon: Code, color: "from-purple-500/10 to-purple-500/5" },
-            { label: "Total", score: scores.total_score, icon: Trophy, color: "from-amber-500/10 to-amber-500/5" },
-          ].map((item) => (
-            <Card key={item.label} className="bg-gradient-to-br border">
-              <CardContent className="p-5">
-                <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
-                    <item.icon className="h-4 w-4" /> {item.label}
-                  </div>
-                  <span className={`text-2xl font-bold ${scoreColor(item.score)}`}>{item.score}</span>
-                </div>
-                <Progress value={item.score} className="h-2" />
-              </CardContent>
-            </Card>
-          ))}
+        {/* Score Cards - 4 categories with marks */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <Card className="border">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground mb-3">
+                <Code className="h-4 w-4" /> Technical MCQs
+              </div>
+              <div className="flex items-baseline gap-1 mb-2">
+                <span className={`text-3xl font-bold ${marksBadge(technicalCorrect, technicalQs.length)}`}>{technicalCorrect}</span>
+                <span className="text-lg text-muted-foreground">/ {technicalQs.length}</span>
+              </div>
+              <Progress value={technicalQs.length > 0 ? (technicalCorrect / technicalQs.length) * 100 : 0} className="h-2" />
+              <p className="text-xs text-muted-foreground mt-2">1 mark per correct answer</p>
+            </CardContent>
+          </Card>
+
+          <Card className="border">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground mb-3">
+                <Calculator className="h-4 w-4" /> Numerical Ability
+              </div>
+              <div className="flex items-baseline gap-1 mb-2">
+                <span className={`text-3xl font-bold ${marksBadge(numericalCorrect, numericalQs.length)}`}>{numericalCorrect}</span>
+                <span className="text-lg text-muted-foreground">/ {numericalQs.length}</span>
+              </div>
+              <Progress value={numericalQs.length > 0 ? (numericalCorrect / numericalQs.length) * 100 : 0} className="h-2" />
+              <p className="text-xs text-muted-foreground mt-2">1 mark per correct answer</p>
+            </CardContent>
+          </Card>
+
+          <Card className="border">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground mb-3">
+                <Code className="h-4 w-4" /> Coding
+              </div>
+              <div className="flex items-baseline gap-1 mb-2">
+                <span className={`text-3xl font-bold ${marksBadge(codingCorrect, codingResponses.length)}`}>{codingCorrect}</span>
+                <span className="text-lg text-muted-foreground">/ {codingResponses.length}</span>
+              </div>
+              <Progress value={codingResponses.length > 0 ? (codingCorrect / codingResponses.length) * 100 : 0} className="h-2" />
+              <p className="text-xs text-muted-foreground mt-2">1 mark if ≥50% correct code</p>
+            </CardContent>
+          </Card>
+
+          <Card className="border bg-gradient-to-br from-primary/5 to-primary/10">
+            <CardContent className="p-5">
+              <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground mb-3">
+                <Trophy className="h-4 w-4" /> Total Score
+              </div>
+              <div className="flex items-baseline gap-1 mb-2">
+                <span className={`text-3xl font-bold ${marksBadge(totalMarks, totalPossible)}`}>{totalMarks}</span>
+                <span className="text-lg text-muted-foreground">/ {totalPossible}</span>
+              </div>
+              <Progress value={totalPossible > 0 ? (totalMarks / totalPossible) * 100 : 0} className="h-2" />
+              <p className="text-xs text-muted-foreground mt-2">{totalPossible > 0 ? Math.round((totalMarks / totalPossible) * 100) : 0}% overall</p>
+            </CardContent>
+          </Card>
         </div>
 
         {/* AI Summary */}
@@ -171,11 +226,7 @@ const CandidateReport = () => {
 
         {/* Aptitude Breakdown */}
         {aptitudeResponses.length > 0 && (() => {
-          const classified = aptitudeResponses.map((r, i) => ({ ...r, index: i, isNumerical: isNumericalQuestion(r.question_text) }));
-          const technical = classified.filter((r) => !r.isNumerical);
-          const numerical = classified.filter((r) => r.isNumerical);
-
-          const renderQuestion = (r: typeof classified[0]) => (
+          const renderQuestion = (r: typeof classifiedAptitude[0]) => (
             <div key={r.index} className={`p-4 rounded-lg border ${r.is_correct ? "border-green-500/30 bg-green-500/5" : "border-destructive/30 bg-destructive/5"}`}>
               <div className="flex items-start justify-between mb-2">
                 <p className="text-sm font-medium">Q{r.index + 1}: {r.question_text}</p>
@@ -183,8 +234,8 @@ const CandidateReport = () => {
                   <Badge variant="outline" className="text-xs gap-1">
                     {r.isNumerical ? <><Calculator className="h-3 w-3" /> Numerical</> : <><Code className="h-3 w-3" /> Technical</>}
                   </Badge>
-                  <Badge variant={r.is_correct ? "default" : "destructive"} className="text-xs">
-                    {r.is_correct ? "Correct" : "Wrong"}
+                  <Badge variant={r.is_correct ? "default" : "destructive"} className="text-xs gap-1">
+                    {r.is_correct ? <><CheckCircle2 className="h-3 w-3" /> 1 mark</> : <><XCircle className="h-3 w-3" /> 0 marks</>}
                   </Badge>
                 </div>
               </div>
@@ -203,26 +254,29 @@ const CandidateReport = () => {
             <Card className="mb-6">
               <CardHeader className="pb-3">
                 <CardTitle className="text-base flex items-center gap-2">
-                  <Brain className="h-4 w-4" /> Aptitude Questions ({aptitudeResponses.filter((r) => r.is_correct).length}/{aptitudeResponses.length} correct)
+                  <Brain className="h-4 w-4" /> Aptitude Questions
+                  <Badge variant="secondary" className="ml-auto text-xs">
+                    {technicalCorrect + numericalCorrect}/{aptitudeResponses.length} correct
+                  </Badge>
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <Tabs defaultValue="all">
                   <TabsList className="mb-4">
-                    <TabsTrigger value="all">All ({classified.length})</TabsTrigger>
+                    <TabsTrigger value="all">All ({classifiedAptitude.length})</TabsTrigger>
                     <TabsTrigger value="technical">
-                      <Code className="h-3.5 w-3.5 mr-1" /> Technical ({technical.length})
+                      <Code className="h-3.5 w-3.5 mr-1" /> Technical ({technicalQs.length}) — {technicalCorrect} ✓
                     </TabsTrigger>
                     <TabsTrigger value="numerical">
-                      <Calculator className="h-3.5 w-3.5 mr-1" /> Numerical ({numerical.length})
+                      <Calculator className="h-3.5 w-3.5 mr-1" /> Numerical ({numericalQs.length}) — {numericalCorrect} ✓
                     </TabsTrigger>
                   </TabsList>
-                  <TabsContent value="all" className="space-y-4">{classified.map(renderQuestion)}</TabsContent>
+                  <TabsContent value="all" className="space-y-4">{classifiedAptitude.map(renderQuestion)}</TabsContent>
                   <TabsContent value="technical" className="space-y-4">
-                    {technical.length ? technical.map(renderQuestion) : <p className="text-sm text-muted-foreground">No technical questions.</p>}
+                    {technicalQs.length ? technicalQs.map(renderQuestion) : <p className="text-sm text-muted-foreground">No technical questions.</p>}
                   </TabsContent>
                   <TabsContent value="numerical" className="space-y-4">
-                    {numerical.length ? numerical.map(renderQuestion) : <p className="text-sm text-muted-foreground">No numerical questions.</p>}
+                    {numericalQs.length ? numericalQs.map(renderQuestion) : <p className="text-sm text-muted-foreground">No numerical questions.</p>}
                   </TabsContent>
                 </Tabs>
               </CardContent>
@@ -234,12 +288,22 @@ const CandidateReport = () => {
         {codingResponses.length > 0 && (
           <Card className="mb-6">
             <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2"><Code className="h-4 w-4" /> Coding Submissions</CardTitle>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Code className="h-4 w-4" /> Coding Submissions
+                <Badge variant="secondary" className="ml-auto text-xs">
+                  {codingCorrect}/{codingResponses.length} passed (≥50% threshold)
+                </Badge>
+              </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               {codingResponses.map((r, i) => (
-                <div key={i} className="p-4 rounded-lg border">
-                  <h4 className="text-sm font-medium mb-1">{r.title}</h4>
+                <div key={i} className={`p-4 rounded-lg border ${r.is_correct === true ? "border-green-500/30 bg-green-500/5" : r.is_correct === false ? "border-destructive/30 bg-destructive/5" : ""}`}>
+                  <div className="flex items-center justify-between mb-1">
+                    <h4 className="text-sm font-medium">{r.title}</h4>
+                    <Badge variant={r.is_correct === true ? "default" : r.is_correct === false ? "destructive" : "secondary"} className="text-xs gap-1">
+                      {r.is_correct === true ? <><CheckCircle2 className="h-3 w-3" /> 1 mark</> : r.is_correct === false ? <><XCircle className="h-3 w-3" /> 0 marks</> : "Not evaluated"}
+                    </Badge>
+                  </div>
                   <p className="text-xs text-muted-foreground mb-3">{r.description}</p>
                   {r.code ? (
                     <div className="bg-secondary rounded-lg p-3 overflow-x-auto">
