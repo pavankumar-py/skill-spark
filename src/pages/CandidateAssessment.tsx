@@ -228,6 +228,9 @@ const CandidateAssessment = () => {
     toast.success("Assessment submitted and evaluated!");
   };
 
+  // Keep ref updated for timer
+  submitRef.current = submitAssessment;
+
   const runCode = () => {
     setOutput("⚠ Code execution is for preview only. Your code will be evaluated by AI upon submission.");
   };
