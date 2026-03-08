@@ -241,7 +241,7 @@ const CreateAssessment = () => {
               <h3 className="font-medium">Coding Questions</h3>
               <div className="space-y-2"><Label>Number of Questions</Label><Select value={form.codingCount} onValueChange={(v) => setForm({ ...form, codingCount: v })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{["1", "2", "3", "4", "5"].map((n) => <SelectItem key={n} value={n}>{n} questions</SelectItem>)}</SelectContent></Select></div>
               <div className="space-y-2"><Label>Difficulty Level</Label><Select value={form.codingDifficulty} onValueChange={(v) => setForm({ ...form, codingDifficulty: v })}><SelectTrigger><SelectValue placeholder="Select difficulty" /></SelectTrigger><SelectContent>{["Easy", "Medium", "Hard"].map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent></Select></div>
-              <div className="space-y-2"><Label>Topics</Label><div className="flex flex-wrap gap-2">{topicOptions.map((t) => <Badge key={t} variant={form.codingTopics.includes(t) ? "default" : "outline"} className="cursor-pointer" onClick={() => setForm({ ...form, codingTopics: toggleArrayItem(form.codingTopics, t) })}>{t}</Badge>)}</div></div>
+              <div className="space-y-2"><Label>Topics</Label><div className="flex flex-wrap gap-2">{codingTopicOptions.map((t) => <Badge key={t} variant={form.codingTopics.includes(t) ? "default" : "outline"} className="cursor-pointer" onClick={() => setForm({ ...form, codingTopics: toggleArrayItem(form.codingTopics, t) })}>{t}</Badge>)}</div></div>
               <p className="text-xs text-muted-foreground">Supported languages: Python, JavaScript</p>
             </div>
           )}
