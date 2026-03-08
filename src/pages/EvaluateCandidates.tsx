@@ -42,6 +42,7 @@ const EvaluateCandidates = () => {
   const [filterPercent, setFilterPercent] = useState<string>("all");
   const [minScore, setMinScore] = useState("");
   const [showModal, setShowModal] = useState(false);
+  const [showComingSoon, setShowComingSoon] = useState(false);
   const [messageType, setMessageType] = useState<MessageType>("qualified");
   const [customMessage, setCustomMessage] = useState("");
 
