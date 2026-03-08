@@ -86,6 +86,14 @@ const CandidateAssessment = () => {
   const startAssessment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!assessmentId) return;
+
+    // Check for duplicate candidate
+    const { data: existing } = await supabase.from("candidates").select("id").eq("assessment_id", assessmentId).eq("email", candidate.email);
+    if (existing && existing.length > 0) {
+      toast.error("You have already registered for this assessment.");
+      return;
+    }
+
     const { data, error } = await supabase.from("candidates").insert({
       assessment_id: assessmentId,
       full_name: candidate.name,

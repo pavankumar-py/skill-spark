@@ -115,7 +115,11 @@ const EvaluateCandidates = () => {
       </div>
 
       {candidates.length === 0 ? (
-        <div className="glass-card p-12 text-center text-muted-foreground">No completed candidates yet.</div>
+        <div className="glass-card p-12 text-center">
+          <Search className="h-10 w-10 text-muted-foreground/50 mx-auto mb-3" />
+          <h3 className="font-medium mb-1">No completed candidates yet</h3>
+          <p className="text-sm text-muted-foreground">Share your assessment links with candidates. Once they complete assessments, their results will appear here.</p>
+        </div>
       ) : (
         <div className="glass-card overflow-hidden">
           <div className="overflow-x-auto">
