@@ -9,11 +9,6 @@ import { ArrowRight, Zap, Shield, Brain, Code, BarChart3 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-const stats = [
-  { value: "10K+", label: "Assessments Created" },
-  { value: "50K+", label: "Candidates Evaluated" },
-  { value: "98%", label: "Accuracy Rate" },
-];
 
 const features = [
   { icon: Brain, text: "AI-powered question generation" },
@@ -117,25 +112,6 @@ const Login = () => {
               ))}
             </motion.div>
 
-            {/* Stats */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.5 }}
-              className="flex gap-8"
-            >
-              {stats.map((s, i) => (
-                <motion.div
-                  key={s.label}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.6 + i * 0.1 }}
-                >
-                  <p className="text-2xl font-bold text-white">{s.value}</p>
-                  <p className="text-xs text-white/50 mt-0.5">{s.label}</p>
-                </motion.div>
-              ))}
-            </motion.div>
           </div>
 
           {/* Bottom testimonial */}
