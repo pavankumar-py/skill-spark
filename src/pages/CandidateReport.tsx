@@ -170,35 +170,65 @@ const CandidateReport = () => {
         </Card>
 
         {/* Aptitude Breakdown */}
-        {aptitudeResponses.length > 0 && (
-          <Card className="mb-6">
-            <CardHeader className="pb-3">
-              <CardTitle className="text-base flex items-center gap-2">
-                <Brain className="h-4 w-4" /> Aptitude Questions ({aptitudeResponses.filter((r) => r.is_correct).length}/{aptitudeResponses.length} correct)
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {aptitudeResponses.map((r, i) => (
-                <div key={i} className={`p-4 rounded-lg border ${r.is_correct ? "border-green-500/30 bg-green-500/5" : "border-destructive/30 bg-destructive/5"}`}>
-                  <div className="flex items-start justify-between mb-2">
-                    <p className="text-sm font-medium">Q{i + 1}: {r.question_text}</p>
-                    <Badge variant={r.is_correct ? "default" : "destructive"} className="text-xs shrink-0 ml-2">
-                      {r.is_correct ? "Correct" : "Wrong"}
-                    </Badge>
-                  </div>
-                  <div className="space-y-1 text-xs">
-                    {r.options.map((opt, j) => (
-                      <div key={j} className={`px-2 py-1 rounded ${j === r.correct_answer ? "text-green-600 font-medium" : j === r.candidate_answer && !r.is_correct ? "text-destructive line-through" : "text-muted-foreground"}`}>
-                        {j === r.correct_answer ? "✓ " : j === r.candidate_answer && !r.is_correct ? "✗ " : "  "}{opt}
-                      </div>
-                    ))}
-                    {r.candidate_answer === null && <p className="text-muted-foreground italic">Not answered</p>}
-                  </div>
+        {aptitudeResponses.length > 0 && (() => {
+          const classified = aptitudeResponses.map((r, i) => ({ ...r, index: i, isNumerical: isNumericalQuestion(r.question_text) }));
+          const technical = classified.filter((r) => !r.isNumerical);
+          const numerical = classified.filter((r) => r.isNumerical);
+
+          const renderQuestion = (r: typeof classified[0]) => (
+            <div key={r.index} className={`p-4 rounded-lg border ${r.is_correct ? "border-green-500/30 bg-green-500/5" : "border-destructive/30 bg-destructive/5"}`}>
+              <div className="flex items-start justify-between mb-2">
+                <p className="text-sm font-medium">Q{r.index + 1}: {r.question_text}</p>
+                <div className="flex items-center gap-1.5 shrink-0 ml-2">
+                  <Badge variant="outline" className="text-xs gap-1">
+                    {r.isNumerical ? <><Calculator className="h-3 w-3" /> Numerical</> : <><Code className="h-3 w-3" /> Technical</>}
+                  </Badge>
+                  <Badge variant={r.is_correct ? "default" : "destructive"} className="text-xs">
+                    {r.is_correct ? "Correct" : "Wrong"}
+                  </Badge>
                 </div>
-              ))}
-            </CardContent>
-          </Card>
-        )}
+              </div>
+              <div className="space-y-1 text-xs">
+                {r.options.map((opt, j) => (
+                  <div key={j} className={`px-2 py-1 rounded ${j === r.correct_answer ? "text-green-600 font-medium" : j === r.candidate_answer && !r.is_correct ? "text-destructive line-through" : "text-muted-foreground"}`}>
+                    {j === r.correct_answer ? "✓ " : j === r.candidate_answer && !r.is_correct ? "✗ " : "  "}{opt}
+                  </div>
+                ))}
+                {r.candidate_answer === null && <p className="text-muted-foreground italic">Not answered</p>}
+              </div>
+            </div>
+          );
+
+          return (
+            <Card className="mb-6">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Brain className="h-4 w-4" /> Aptitude Questions ({aptitudeResponses.filter((r) => r.is_correct).length}/{aptitudeResponses.length} correct)
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Tabs defaultValue="all">
+                  <TabsList className="mb-4">
+                    <TabsTrigger value="all">All ({classified.length})</TabsTrigger>
+                    <TabsTrigger value="technical">
+                      <Code className="h-3.5 w-3.5 mr-1" /> Technical ({technical.length})
+                    </TabsTrigger>
+                    <TabsTrigger value="numerical">
+                      <Calculator className="h-3.5 w-3.5 mr-1" /> Numerical ({numerical.length})
+                    </TabsTrigger>
+                  </TabsList>
+                  <TabsContent value="all" className="space-y-4">{classified.map(renderQuestion)}</TabsContent>
+                  <TabsContent value="technical" className="space-y-4">
+                    {technical.length ? technical.map(renderQuestion) : <p className="text-sm text-muted-foreground">No technical questions.</p>}
+                  </TabsContent>
+                  <TabsContent value="numerical" className="space-y-4">
+                    {numerical.length ? numerical.map(renderQuestion) : <p className="text-sm text-muted-foreground">No numerical questions.</p>}
+                  </TabsContent>
+                </Tabs>
+              </CardContent>
+            </Card>
+          );
+        })()}
 
         {/* Coding Breakdown */}
         {codingResponses.length > 0 && (
