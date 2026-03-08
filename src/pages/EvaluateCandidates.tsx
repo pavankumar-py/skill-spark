@@ -34,6 +34,7 @@ const messageTemplates: Record<MessageType, string> = {
 
 const EvaluateCandidates = () => {
   const { companyId } = useAuth();
+  const navigate = useNavigate();
   const [candidates, setCandidates] = useState<CandidateRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [selected, setSelected] = useState<string[]>([]);
