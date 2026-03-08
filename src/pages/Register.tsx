@@ -81,7 +81,7 @@ const Register = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <span className="text-4xl font-bold text-white tracking-tight drop-shadow-lg">Verifyr</span>
+            <span className="text-4xl font-bold tracking-tight drop-shadow-lg bg-gradient-to-r from-white via-white/90 to-white/70 bg-clip-text text-transparent">Verifyr</span>
           </motion.div>
 
           {/* Main content */}
@@ -136,7 +136,7 @@ const Register = () => {
         >
           {/* Mobile logo */}
           <div className="lg:hidden mb-10">
-            <span className="text-3xl font-bold tracking-tight text-primary">Verifyr</span>
+            <span className="text-3xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent">Verifyr</span>
           </div>
 
           <h2 className="text-2xl font-bold tracking-tight mb-1">Create your account</h2>
