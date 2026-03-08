@@ -174,6 +174,18 @@ const EvaluateCandidates = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={showComingSoon} onOpenChange={setShowComingSoon}>
+        <DialogContent className="max-w-sm text-center">
+          <DialogHeader>
+            <DialogTitle>Coming Soon</DialogTitle>
+          </DialogHeader>
+          <p className="text-sm text-muted-foreground py-2">This feature will be available in the future. You'll be notified when it releases.</p>
+          <DialogFooter className="justify-center">
+            <Button onClick={() => setShowComingSoon(false)}>Got it</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
