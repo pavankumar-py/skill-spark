@@ -93,9 +93,9 @@ const Index = () => {
         <div className="max-w-6xl mx-auto px-6 flex items-center justify-between text-sm text-muted-foreground">
           <div className="flex items-center gap-2">
             <Zap className="h-3.5 w-3.5 text-primary" />
-            <span>AssessKit</span>
+            <span>Verifyr</span>
           </div>
-          <span>© {new Date().getFullYear()} AssessKit. All rights reserved.</span>
+          <span>© {new Date().getFullYear()} Verifyr. All rights reserved.</span>
         </div>
       </footer>
     </div>

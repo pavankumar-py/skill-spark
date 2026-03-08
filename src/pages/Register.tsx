@@ -64,7 +64,7 @@ const Register = () => {
             <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
               <Zap className="h-4 w-4 text-primary-foreground" />
             </div>
-            <span className="text-xl font-semibold">AssessKit</span>
+            <span className="text-xl font-semibold">Verifyr</span>
           </div>
 
           <h2 className="text-2xl font-semibold mb-1">Create your account</h2>
