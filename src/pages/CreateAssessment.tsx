@@ -185,11 +185,55 @@ const CreateAssessment = () => {
             </div>
           )}
           {step === 1 && (
-            <div className="space-y-4">
+            <div className="space-y-5">
               <h3 className="font-medium">Aptitude Questions</h3>
-              <div className="space-y-2"><Label>Number of Questions</Label><Select value={form.aptitudeCount} onValueChange={(v) => setForm({ ...form, aptitudeCount: v })}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent>{["5", "10", "15", "20"].map((n) => <SelectItem key={n} value={n}>{n} questions</SelectItem>)}</SelectContent></Select></div>
-              <div className="space-y-2"><Label>Difficulty Level</Label><Select value={form.aptitudeDifficulty} onValueChange={(v) => setForm({ ...form, aptitudeDifficulty: v })}><SelectTrigger><SelectValue placeholder="Select difficulty" /></SelectTrigger><SelectContent>{["Easy", "Medium", "Hard"].map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent></Select></div>
-              <p className="text-xs text-muted-foreground">Questions will be AI-generated based on the selected role and tech stack.</p>
+              
+              <div className="space-y-3 p-4 rounded-lg border">
+                <h4 className="text-sm font-medium">Technical MCQs</h4>
+                <div className="space-y-2">
+                  <Label>Number of Questions</Label>
+                  <Select value={form.technicalCount} onValueChange={(v) => setForm({ ...form, technicalCount: v })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>{["0", "2", "3", "5", "7", "10"].map((n) => <SelectItem key={n} value={n}>{n} questions</SelectItem>)}</SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Topics</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {technicalMcqTopicOptions.map((t) => (
+                      <Badge key={t} variant={form.technicalMcqTopics.includes(t) ? "default" : "outline"} className="cursor-pointer" onClick={() => setForm({ ...form, technicalMcqTopics: toggleArrayItem(form.technicalMcqTopics, t) })}>{t}</Badge>
+                    ))}
+                  </div>
+                  <p className="text-xs text-muted-foreground">Topics will also be inferred from your selected tech stack.</p>
+                </div>
+              </div>
+
+              <div className="space-y-3 p-4 rounded-lg border">
+                <h4 className="text-sm font-medium">Numerical Ability</h4>
+                <div className="space-y-2">
+                  <Label>Number of Questions</Label>
+                  <Select value={form.numericalCount} onValueChange={(v) => setForm({ ...form, numericalCount: v })}>
+                    <SelectTrigger><SelectValue /></SelectTrigger>
+                    <SelectContent>{["0", "2", "3", "5", "7", "10"].map((n) => <SelectItem key={n} value={n}>{n} questions</SelectItem>)}</SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label>Topics</Label>
+                  <div className="flex flex-wrap gap-2">
+                    {numericalTopicOptions.map((t) => (
+                      <Badge key={t} variant={form.numericalTopics.includes(t) ? "default" : "outline"} className="cursor-pointer" onClick={() => setForm({ ...form, numericalTopics: toggleArrayItem(form.numericalTopics, t) })}>{t}</Badge>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label>Difficulty Level</Label>
+                <Select value={form.aptitudeDifficulty} onValueChange={(v) => setForm({ ...form, aptitudeDifficulty: v })}>
+                  <SelectTrigger><SelectValue placeholder="Select difficulty" /></SelectTrigger>
+                  <SelectContent>{["Easy", "Medium", "Hard"].map((d) => <SelectItem key={d} value={d}>{d}</SelectItem>)}</SelectContent>
+                </Select>
+              </div>
             </div>
           )}
           {step === 2 && (
