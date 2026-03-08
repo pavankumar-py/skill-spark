@@ -125,11 +125,11 @@ const Login = () => {
           className="w-full max-w-sm"
         >
           {/* Mobile logo */}
-          <div className="lg:hidden flex items-center gap-2 mb-10">
-            <div className="h-9 w-9 rounded-xl bg-primary flex items-center justify-center">
-              <Zap className="h-4.5 w-4.5 text-primary-foreground" />
+          <div className="lg:hidden flex items-center gap-3 mb-10">
+            <div className="h-11 w-11 rounded-xl bg-primary flex items-center justify-center">
+              <Zap className="h-5 w-5 text-primary-foreground" />
             </div>
-            <span className="text-xl font-bold tracking-tight">Verifyr</span>
+            <span className="text-2xl font-bold tracking-tight">Verifyr</span>
           </div>
 
           <h2 className="text-2xl font-bold tracking-tight mb-1">Welcome back</h2>
