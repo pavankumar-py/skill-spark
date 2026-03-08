@@ -14,6 +14,7 @@ import PreviousAssessments from "./pages/PreviousAssessments";
 import EvaluateCandidates from "./pages/EvaluateCandidates";
 import SettingsPage from "./pages/Settings";
 import CandidateAssessment from "./pages/CandidateAssessment";
+import CandidateReport from "./pages/CandidateReport";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
