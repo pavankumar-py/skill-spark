@@ -135,11 +135,8 @@ const Register = () => {
           className="w-full max-w-sm"
         >
           {/* Mobile logo */}
-          <div className="lg:hidden flex items-center gap-3 mb-10">
-            <div className="h-11 w-11 rounded-xl bg-primary flex items-center justify-center">
-              <Zap className="h-5 w-5 text-primary-foreground" />
-            </div>
-            <span className="text-2xl font-bold tracking-tight">Verifyr</span>
+          <div className="lg:hidden mb-10">
+            <span className="text-3xl font-bold tracking-tight text-primary">Verifyr</span>
           </div>
 
           <h2 className="text-2xl font-bold tracking-tight mb-1">Create your account</h2>
