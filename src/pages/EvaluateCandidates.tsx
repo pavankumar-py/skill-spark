@@ -6,9 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { Send, Filter, ArrowUpDown } from "lucide-react";
+import { Send, Filter, ArrowUpDown, Search } from "lucide-react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 import { supabase } from "@/integrations/supabase/client";
@@ -25,13 +23,6 @@ interface CandidateRow {
   aiSummary: string;
 }
 
-type MessageType = "qualified" | "interview" | "rejection";
-const messageTemplates: Record<MessageType, string> = {
-  qualified: "Dear {name},\n\nCongratulations! You have been qualified for the next round.\n\nBest regards,\nThe Hiring Team",
-  interview: "Dear {name},\n\nWe are pleased to invite you for an interview. Please respond with your availability.\n\nBest regards,\nThe Hiring Team",
-  rejection: "Dear {name},\n\nThank you for participating. Unfortunately, we will not be moving forward at this time.\n\nBest regards,\nThe Hiring Team",
-};
-
 const EvaluateCandidates = () => {
   const { companyId } = useAuth();
   const navigate = useNavigate();
@@ -41,10 +32,8 @@ const EvaluateCandidates = () => {
   const [sortBy, setSortBy] = useState<"score" | "name">("score");
   const [filterPercent, setFilterPercent] = useState<string>("all");
   const [minScore, setMinScore] = useState("");
-  const [showModal, setShowModal] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const [showComingSoon, setShowComingSoon] = useState(false);
-  const [messageType, setMessageType] = useState<MessageType>("qualified");
-  const [customMessage, setCustomMessage] = useState("");
 
   useEffect(() => {
     if (!companyId) return;
@@ -79,7 +68,10 @@ const EvaluateCandidates = () => {
     fetchCandidates();
   }, [companyId]);
 
-  const sorted = [...candidates].sort((a, b) => sortBy === "score" ? b.totalScore - a.totalScore : a.name.localeCompare(b.name));
+  const searched = candidates.filter((c) =>
+    c.name.toLowerCase().includes(searchQuery.toLowerCase()) || c.email.toLowerCase().includes(searchQuery.toLowerCase()) || c.assessmentName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+  const sorted = [...searched].sort((a, b) => sortBy === "score" ? b.totalScore - a.totalScore : a.name.localeCompare(b.name));
   const filtered = sorted.filter((c) => {
     if (minScore && c.totalScore < Number(minScore)) return false;
     if (filterPercent === "all") return true;
@@ -89,9 +81,7 @@ const EvaluateCandidates = () => {
 
   const toggleSelect = (id: string) => setSelected((s) => s.includes(id) ? s.filter((i) => i !== id) : [...s, id]);
   const toggleAll = () => setSelected(selected.length === filtered.length ? [] : filtered.map((c) => c.id));
-
-  const handleSend = () => { toast.success(`Messages sent to ${selected.length} candidate(s)!`); setShowModal(false); setSelected([]); };
-  const openSmartSend = () => { setShowComingSoon(true); };
+  const openSmartSend = () => setShowComingSoon(true);
 
   if (loading) return <div className="p-6 text-muted-foreground">Loading...</div>;
 
@@ -103,6 +93,10 @@ const EvaluateCandidates = () => {
       </motion.div>
 
       <div className="flex flex-wrap items-center gap-3 mb-4">
+        <div className="relative flex-1 max-w-xs">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input placeholder="Search candidates..." className="pl-9 h-8 text-xs" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+        </div>
         <div className="flex items-center gap-2">
           <Filter className="h-4 w-4 text-muted-foreground" />
           <Select value={filterPercent} onValueChange={setFilterPercent}><SelectTrigger className="w-[130px] h-8 text-xs"><SelectValue /></SelectTrigger><SelectContent><SelectItem value="all">All Candidates</SelectItem><SelectItem value="10">Top 10%</SelectItem><SelectItem value="20">Top 20%</SelectItem></SelectContent></Select>
@@ -126,8 +120,8 @@ const EvaluateCandidates = () => {
                   <th className="p-3 w-10"><Checkbox checked={selected.length === filtered.length && filtered.length > 0} onCheckedChange={toggleAll} /></th>
                   <th className="text-left p-3 font-medium text-muted-foreground">Name</th>
                   <th className="text-left p-3 font-medium text-muted-foreground">Assessment</th>
-                  <th className="text-center p-3 font-medium text-muted-foreground">Aptitude (marks)</th>
-                  <th className="text-center p-3 font-medium text-muted-foreground">Coding (marks)</th>
+                  <th className="text-center p-3 font-medium text-muted-foreground">Aptitude</th>
+                  <th className="text-center p-3 font-medium text-muted-foreground">Coding</th>
                   <th className="text-center p-3 font-medium text-muted-foreground">Total %</th>
                   <th className="text-left p-3 font-medium text-muted-foreground">AI Summary</th>
                 </tr>
@@ -153,37 +147,11 @@ const EvaluateCandidates = () => {
         </div>
       )}
 
-      <Dialog open={showModal} onOpenChange={setShowModal}>
-        <DialogContent>
-          <DialogHeader><DialogTitle>Smart Send</DialogTitle></DialogHeader>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label>Message Type</Label>
-              <Select value={messageType} onValueChange={(v: MessageType) => { setMessageType(v); setCustomMessage(messageTemplates[v]); }}><SelectTrigger><SelectValue /></SelectTrigger><SelectContent><SelectItem value="qualified">Qualified for Next Round</SelectItem><SelectItem value="interview">Interview Invitation</SelectItem><SelectItem value="rejection">Rejection Email</SelectItem></SelectContent></Select>
-            </div>
-            <div className="space-y-2">
-              <Label>Message Preview</Label>
-              <Textarea className="min-h-[150px] text-sm" value={customMessage} onChange={(e) => setCustomMessage(e.target.value)} />
-              <p className="text-xs text-muted-foreground">Use {"{name}"} for candidate name personalization</p>
-            </div>
-            <p className="text-sm text-muted-foreground">Sending to <strong>{selected.length}</strong> candidate(s)</p>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setShowModal(false)}>Cancel</Button>
-            <Button onClick={handleSend}><Send className="h-4 w-4 mr-1" /> Send Messages</Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
-
       <Dialog open={showComingSoon} onOpenChange={setShowComingSoon}>
         <DialogContent className="max-w-sm text-center">
-          <DialogHeader>
-            <DialogTitle>Coming Soon</DialogTitle>
-          </DialogHeader>
+          <DialogHeader><DialogTitle>Coming Soon</DialogTitle></DialogHeader>
           <p className="text-sm text-muted-foreground py-2">This feature will be available in the future. You'll be notified when it releases.</p>
-          <DialogFooter className="justify-center">
-            <Button onClick={() => setShowComingSoon(false)}>Got it</Button>
-          </DialogFooter>
+          <DialogFooter className="justify-center"><Button onClick={() => setShowComingSoon(false)}>Got it</Button></DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

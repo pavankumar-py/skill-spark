@@ -68,7 +68,7 @@ const Login = () => {
                 <Checkbox id="remember" />
                 <label htmlFor="remember" className="text-sm text-muted-foreground cursor-pointer">Remember me</label>
               </div>
-              <button type="button" className="text-sm text-primary hover:underline">Forgot password?</button>
+              <Link to="/forgot-password" className="text-sm text-primary hover:underline">Forgot password?</Link>
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
               {loading ? "Signing in..." : "Sign in"} {!loading && <ArrowRight className="ml-2 h-4 w-4" />}
