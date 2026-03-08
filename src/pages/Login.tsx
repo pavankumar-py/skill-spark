@@ -9,11 +9,6 @@ import { ArrowRight, Zap, Shield, Brain, Code, BarChart3 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-const stats = [
-  { value: "10K+", label: "Assessments Created" },
-  { value: "50K+", label: "Candidates Evaluated" },
-  { value: "98%", label: "Accuracy Rate" },
-];
 
 const features = [
   { icon: Brain, text: "AI-powered question generation" },
