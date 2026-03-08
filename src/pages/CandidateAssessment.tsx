@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight, ArrowLeft, Clock, AlertTriangle, Play, Zap, Send, Brain, ShieldCheck, BookOpen, Timer, CheckCircle2, XOctagon, Sparkles } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
