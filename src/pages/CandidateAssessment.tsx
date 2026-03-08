@@ -92,7 +92,7 @@ const CandidateAssessment = () => {
 
     if (error || !data) { toast.error("Failed to register"); return; }
     setCandidateId(data.id);
-    setPhase(aptitudeQuestions.length > 0 ? "aptitude" : "coding");
+    setPhase("instructions");
   };
 
   const submitAssessment = async () => {
