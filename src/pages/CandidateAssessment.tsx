@@ -373,7 +373,15 @@ const CandidateAssessment = () => {
               <p className="text-xs text-muted-foreground mt-1">Stay focused, take your time, and do your best.</p>
             </div>
 
-            <Button onClick={beginAssessment} className="w-full" size="lg">
+            {/* Acknowledgment */}
+            <div className="flex items-start gap-3 p-3 rounded-lg border">
+              <Checkbox id="acknowledge" checked={acknowledged} onCheckedChange={(v) => setAcknowledged(v === true)} className="mt-0.5" />
+              <label htmlFor="acknowledge" className="text-sm cursor-pointer select-none">
+                I have read and understood the instructions and rules. I agree to take this assessment honestly and without any external help.
+              </label>
+            </div>
+
+            <Button onClick={beginAssessment} className="w-full" size="lg" disabled={!acknowledged}>
               Begin Assessment <ArrowRight className="ml-2 h-4 w-4" />
             </Button>
           </div>
