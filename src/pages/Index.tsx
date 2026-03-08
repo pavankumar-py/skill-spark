@@ -20,7 +20,7 @@ const Index = () => {
             <div className="h-7 w-7 rounded-lg bg-primary flex items-center justify-center">
               <Zap className="h-3.5 w-3.5 text-primary-foreground" />
             </div>
-            <span className="font-semibold">AssessKit</span>
+            <span className="font-semibold">Verifyr</span>
           </div>
           <div className="flex items-center gap-3">
             <Button variant="ghost" size="sm" asChild><Link to="/login">Sign in</Link></Button>
