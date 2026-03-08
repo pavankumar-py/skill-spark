@@ -14,13 +14,19 @@ serve(async (req) => {
 
     const { role, techStack, experience, aptitudeCount, aptitudeDifficulty, codingCount, codingDifficulty, codingTopics } = await req.json();
 
-    // Generate aptitude questions
+    // Generate aptitude questions - 50% technical, 50% numerical ability
+    const technicalCount = Math.ceil(aptitudeCount / 2);
+    const numericalCount = aptitudeCount - technicalCount;
     const aptitudePrompt = `Generate exactly ${aptitudeCount} multiple-choice aptitude questions for a ${role} developer role.
 Tech stack: ${techStack.join(", ") || "general programming"}.
 Experience level: ${experience || "mid-level"}.
 Difficulty: ${aptitudeDifficulty || "Medium"}.
 
-Each question must test technical knowledge relevant to the role and tech stack.`;
+IMPORTANT: Generate a MIX of two categories:
+1. Exactly ${technicalCount} TECHNICAL MCQs — testing knowledge of ${techStack.join(", ") || "programming concepts"}, frameworks, language syntax, debugging, system design, etc.
+2. Exactly ${numericalCount} NUMERICAL ABILITY questions — testing quantitative aptitude like number series, percentages, ratios, profit/loss, time & work, probability, data interpretation, and logical reasoning with numbers.
+
+Alternate between technical and numerical questions. Do NOT generate only technical questions.`;
 
     const aptitudeResponse = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
