@@ -82,7 +82,7 @@ const CreateAssessment = () => {
         role: form.role,
         tech_stack: form.techStack,
         experience_level: form.experience,
-        aptitude_count: Number(form.aptitudeCount),
+        aptitude_count: Number(form.technicalCount) + Number(form.numericalCount),
         coding_count: Number(form.codingCount),
         aptitude_difficulty: form.aptitudeDifficulty,
         coding_difficulty: form.codingDifficulty,
