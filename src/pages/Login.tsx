@@ -65,12 +65,12 @@ const Login = () => {
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
-            className="flex items-center gap-2.5"
+            className="flex items-center gap-3"
           >
-            <div className="h-9 w-9 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/20">
-              <Zap className="h-4.5 w-4.5 text-white" />
+            <div className="h-12 w-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center border border-white/20">
+              <Zap className="h-6 w-6 text-white" />
             </div>
-            <span className="text-xl font-bold text-white tracking-tight">Verifyr</span>
+            <span className="text-3xl font-bold text-white tracking-tight">Verifyr</span>
           </motion.div>
 
           {/* Main content */}
